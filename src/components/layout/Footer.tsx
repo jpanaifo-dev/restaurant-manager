@@ -12,6 +12,7 @@ import {
 } from 'tabler-icons-react'
 import { cn } from '../../libs/utils'
 import { APP_URL } from '../../libs/config.url'
+import { useLocation } from 'react-router-dom'
 
 const navItems = [
   { to: APP_URL.TABLES.BASE, label: 'Mesas', Icon: BrandAirtable },
@@ -23,6 +24,8 @@ const navItems = [
 ]
 
 const Footer: React.FC = () => {
+  const location = useLocation()
+
   return (
     <footer className="fixed inset-x-0 bottom-4 z-50">
       <div className="mx-auto px-4">
@@ -45,7 +48,10 @@ const Footer: React.FC = () => {
                 <NavLink
                   to={to}
                   className={cn(
-                    'flex flex-col gap-3 items-center bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition px-4 py-6 rounded-lg min-w-40 md:min-w-48 w-full'
+                    'flex flex-col gap-3 items-center bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition px-4 py-6 rounded-lg min-w-40 md:min-w-48 w-full',
+                    location.pathname === to
+                      ? 'bg-gray-200 text-gray-800 font-semibold shadow'
+                      : ''
                   )}
                 >
                   <Icon size={24} />

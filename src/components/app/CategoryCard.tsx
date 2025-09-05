@@ -23,7 +23,7 @@ export default function CategoryCard({
 
   return (
     <div
-      className="relative w-full h-44 rounded-xl border shadow bg-white flex flex-col items-center justify-center overflow-hidden group transition-all duration-300"
+      className="relative w-full h-44 rounded-xl border shadow bg-white flex flex-col items-center justify-center overflow-hidden group transition-all duration-300 "
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{ borderColor: color }}

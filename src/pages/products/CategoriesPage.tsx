@@ -121,7 +121,7 @@ const CategoriesPage: React.FC = () => {
           ))}
         </div>
       ) : categories.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-xl">
+        <div className="text-center py-12 bg-gray-50 rounded-xl flex flex-col items-center justify-center">
           <p className="text-gray-500">No hay categorías registradas</p>
           <Button
             onClick={() => setShowForm(true)}

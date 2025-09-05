@@ -4,6 +4,7 @@ export const APP_URL = {
   },
   MENUS: {
     BASE: '/menus',
+    CATEGORIES: '/menus/categories',
   },
   ORDERS: {
     BASE: '/orders',

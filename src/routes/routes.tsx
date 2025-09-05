@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { DashboardPage } from '../pages/dashboard/DashboardPage'
 import { TablesPage } from '../pages/tables'
-// import TablePage from '../features/tables/TablePage'
+import { CategoriesPage } from '../pages/products'
 import { DashboardLayout } from '../layouts'
 import { APP_URL } from '../libs/config.url'
 
@@ -25,6 +25,15 @@ const AppRoutes = () => {
           element={
             <DashboardLayout>
               <TablesPage />
+            </DashboardLayout>
+          }
+        />
+        {/* Ruta para la página de categorías */}
+        <Route
+          path={APP_URL.MENUS.CATEGORIES}
+          element={
+            <DashboardLayout>
+              <CategoriesPage />
             </DashboardLayout>
           }
         />

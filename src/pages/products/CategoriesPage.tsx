@@ -86,19 +86,21 @@ const CategoriesPage: React.FC = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex mb-6 flex-col gap-4">
         <h1 className="text-2xl font-bold">Gestión de Categorías</h1>
 
-        <Button
-          onClick={() => {
-            setShowForm(true)
-            setEditingCategory(null)
-          }}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Plus size={16} className="mr-2" />
-          Agregar Categoría
-        </Button>
+        <div>
+          <Button
+            onClick={() => {
+              setShowForm(true)
+              setEditingCategory(null)
+            }}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            <Plus size={16} className="mr-2" />
+            Agregar Categoría
+          </Button>
+        </div>
       </div>
 
       <CategoryForm

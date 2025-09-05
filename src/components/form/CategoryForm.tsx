@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -87,6 +88,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
@@ -101,7 +103,12 @@ const CategoryForm: React.FC<CategoryFormProps> = ({
   useEffect(() => {
     // Reset form when defaultValues change
     if (defaultValues) {
-      reset(defaultValues)
+      Object.keys(defaultValues).forEach((key) => {
+        setValue(
+          key as keyof CategoryFormData,
+          (defaultValues[key as keyof CategoryFormData] ?? '') as string
+        )
+      })
     }
   }, [defaultValues, reset])
 

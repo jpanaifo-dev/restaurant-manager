@@ -30,7 +30,7 @@ export default function CategoryCard({
     >
       {/* Botones de acción */}
       <div
-        className={`absolute top-3 right-3 flex gap-2 transition-opacity duration-300 ${
+        className={`absolute top-3 right-3 flex gap-2 transition-opacity duration-300 z-40 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}
       >

@@ -1,6 +1,6 @@
 // src/Routes.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import DashboardPage from '../pages/DashboardPage'
+import { DashboardPage } from '../pages/dashboard/DashboardPage'
 // import TablePage from '../features/tables/TablePage'
 import { DashboardLayout } from '../layouts'
 

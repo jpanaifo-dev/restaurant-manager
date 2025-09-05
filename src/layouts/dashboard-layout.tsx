@@ -9,7 +9,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 text-gray-800">
+      <div className="min-h-screen flex flex-col py-4 bg-gray-100 text-gray-800 w-full">
         {children}
       </div>
       <Footer />

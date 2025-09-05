@@ -1,6 +1,7 @@
 // src/components/Navbar.tsx
 import React from 'react'
 import { Dropdown, DropdownItem, Avatar } from 'flowbite-react'
+import { DateTimeClock } from '../miscellaneous'
 
 type MenuItem = {
   key: string
@@ -39,7 +40,11 @@ const Navbar: React.FC<Props> = ({
   className = '',
 }) => {
   return (
-    <header className={`w-full shadow-sm ${className}`}>
+    <header
+      className={`w-full
+    fixed top-0 z-50
+    shadow-sm ${className}`}
+    >
       {/* Línea superior fina (como en la imagen) */}
       <div className="h-1 w-full" style={{ backgroundColor: accentTopColor }} />
 
@@ -64,6 +69,9 @@ const Navbar: React.FC<Props> = ({
               {brand}
             </span>
           </div>
+
+          {/* Center: reloj */}
+          <DateTimeClock className="text-sm sm:text-base" />
 
           {/* Derecha: título + usuario con dropdown */}
           <div className="flex items-center gap-4">

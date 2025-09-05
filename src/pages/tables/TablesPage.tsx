@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import supabase from '../../utils/supabase'
 import { type TableFormData } from '../../schemas/tableSchema'
-import { Pencil, Plus, Refresh } from 'tabler-icons-react'
+import { Plus } from 'tabler-icons-react'
 import { TableForm } from '../../components/form'
 import { Button } from 'flowbite-react'
+import TableCard from './TableCard'
 
 interface Table {
   id: number
@@ -104,47 +105,27 @@ const TablesPage: React.FC = () => {
       {loading ? (
         <p>Cargando mesas...</p>
       ) : (
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {tables.map((table) => (
-            <div
+            <TableCard
               key={table.id}
-              className="p-4 border rounded-xl shadow bg-white flex flex-col justify-between"
-            >
-              <div>
-                <h2 className="text-lg font-bold">{table.name}</h2>
-                <p className="text-sm text-gray-500">
-                  Capacidad: {table.capacity}
-                </p>
-                <p className="text-sm text-gray-500">Código: {table.code}</p>
-                <span
-                  className={`inline-block mt-2 px-3 py-1 rounded-full text-xs font-semibold ${
-                    table.status === 'libre'
-                      ? 'bg-green-100 text-green-800'
-                      : table.status === 'ocupada'
-                      ? 'bg-red-100 text-red-800'
-                      : table.status === 'reservada'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-gray-100 text-gray-800'
-                  }`}
-                >
-                  {table.status}
-                </span>
-              </div>
-
-              <div className="flex gap-2 mt-4">
-                <Button
-                  onClick={() => {
-                    setEditingTable(table)
-                    setShowForm(true)
-                  }}
-                >
-                  <Pencil size={16} /> Editar
-                </Button>
-                <Button onClick={() => toggleStatus(table)} color="alternative">
-                  <Refresh size={16} /> Cambiar Estado
-                </Button>
-              </div>
-            </div>
+              capacity={table.capacity}
+              code={table.code}
+              id={table.id}
+              name={table.name}
+              onEdit={() => {
+                setEditingTable(table)
+                setShowForm(true)
+              }}
+              onToggle={() => toggleStatus(table)}
+              status={
+                table.status as
+                  | 'libre'
+                  | 'ocupada'
+                  | 'reservada'
+                  | 'en mantenimiento'
+              }
+            />
           ))}
         </div>
       )}

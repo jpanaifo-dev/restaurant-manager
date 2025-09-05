@@ -33,14 +33,18 @@ const Footer: React.FC = () => {
           </button>
         </div>
         {/*Section navigation*/}
-        <nav className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-md shadow-lg rounded-lg p-4 min-h-32 min-w-32 flex items-center justify-center gap-6">
-          <ul className="flex space-x-6">
+        <nav
+          style={{ left: 'calc(8rem + 4rem)' }}
+          className="fixed bottom-4 right-4 transform
+        bg-white/90 backdrop-blur-md shadow-lg rounded-lg p-4 min-h-32 min-w-32 flex items-center justify-center gap-6"
+        >
+          <ul className="grid grid-cols-6 gap-4">
             {navItems.map(({ to, label, Icon }) => (
               <li key={to}>
                 <NavLink
                   to={to}
                   className={cn(
-                    'flex flex-col gap-3 items-center bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition px-4 py-6 rounded-lg min-w-32 md:min-w-40'
+                    'flex flex-col gap-3 items-center bg-gray-100 text-gray-600 hover:text-gray-800 hover:bg-gray-200 transition px-4 py-6 rounded-lg min-w-40 md:min-w-48 w-full'
                   )}
                 >
                   <Icon size={24} />

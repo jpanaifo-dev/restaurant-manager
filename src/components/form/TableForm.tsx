@@ -39,6 +39,7 @@ const TableForm: React.FC<TableFormProps> = ({
       status: defaultValues?.status || 'libre',
       name: defaultValues?.name || '',
       code: defaultValues?.code || '',
+      shape: defaultValues?.shape || 'circle',
     },
   })
 
@@ -88,6 +89,17 @@ const TableForm: React.FC<TableFormProps> = ({
             {errors.code && (
               <p className="text-red-500 text-sm">{errors.code.message}</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="block text-base">Forma</Label>
+            <Select {...register('shape')}>
+              <option value="circle">Círculo</option>
+              <option value="square">Cuadrado</option>
+              <option value="oval">Óvalo</option>
+              <option value="rectangle">Rectángulo</option>
+              <option value="diamond">Diamante</option>
+            </Select>
           </div>
 
           <div>

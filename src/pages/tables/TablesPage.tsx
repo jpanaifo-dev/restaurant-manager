@@ -12,6 +12,7 @@ interface Table {
   capacity: number
   status: string
   code: string
+  shape?: string
 }
 
 const TablesPage: React.FC = () => {
@@ -124,6 +125,14 @@ const TablesPage: React.FC = () => {
               code={table.code}
               id={table.id}
               name={table.name}
+              shape={
+                table.shape as
+                  | 'circle'
+                  | 'square'
+                  | 'oval'
+                  | 'rectangle'
+                  | 'diamond'
+              }
               onEdit={() => {
                 setEditingTable(table)
                 setShowForm(true)

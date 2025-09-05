@@ -10,6 +10,7 @@ export const tableSchema = z.object({
   end_time: z.date().optional().nullable(),
   status: z.enum(['libre', 'ocupada', 'reservada', 'en mantenimiento']),
   code: z.string().min(1, 'El código es obligatorio'),
+  shape: z.enum(['circle', 'square', 'oval', 'rectangle', 'diamond']),
 })
 
 export type TableFormData = z.infer<typeof tableSchema>

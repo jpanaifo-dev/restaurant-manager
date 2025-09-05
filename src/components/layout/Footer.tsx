@@ -11,14 +11,15 @@ import {
   Soup,
 } from 'tabler-icons-react'
 import { cn } from '../../libs/utils'
+import { APP_URL } from '../../libs/config.url'
 
 const navItems = [
-  { to: '/mesas', label: 'Mesas', Icon: BrandAirtable },
-  { to: '/menus', label: 'Menus', Icon: Soup },
-  { to: '/pedidos', label: 'Pedidos', Icon: Checklist },
-  { to: '/dashboard', label: 'Dashboard', Icon: Dashboard },
-  { to: '/gaveta', label: 'Gaveta', Icon: LayoutGrid },
-  { to: '/imprimir', label: 'Imprimir', Icon: Printer },
+  { to: APP_URL.TABLES.BASE, label: 'Mesas', Icon: BrandAirtable },
+  { to: APP_URL.MENUS.BASE, label: 'Menus', Icon: Soup },
+  { to: APP_URL.ORDERS.BASE, label: 'Pedidos', Icon: Checklist },
+  { to: APP_URL.DASHBOARD.BASE, label: 'Dashboard', Icon: Dashboard },
+  { to: APP_URL.ALMACEN.BASE, label: 'Almacen', Icon: LayoutGrid },
+  { to: APP_URL.PRINTER.BASE, label: 'Imprimir', Icon: Printer },
 ]
 
 const Footer: React.FC = () => {

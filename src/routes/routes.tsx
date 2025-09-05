@@ -1,14 +1,23 @@
 // src/Routes.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import DashboardPage from '../pages/DashboardPage'
-import TablePage from '../features/tables/TablePage'
+// import TablePage from '../features/tables/TablePage'
+import { DashboardLayout } from '../layouts'
 
 const AppRoutes = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/about" element={<TablePage />} />
+        {/* Ruta para el dashboard principal */}
+        <Route
+          path="/"
+          element={
+            <DashboardLayout>
+              <DashboardPage />
+            </DashboardLayout>
+          }
+        />
+
         {/* Ruta para páginas no encontradas */}
         <Route
           path="*"

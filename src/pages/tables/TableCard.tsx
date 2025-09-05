@@ -14,6 +14,7 @@ interface TableCardProps {
 }
 
 export default function TableCard({
+  name,
   code,
   capacity,
   status,
@@ -57,7 +58,7 @@ export default function TableCard({
 
   return (
     <div
-      className={`relative w-full h-52 rounded-xl border-2 ${
+      className={`relative w-full h-64 rounded-xl border-2 ${
         statusConfig.border
       } shadow-lg bg-white flex items-center justify-center overflow-hidden transition-all duration-300 transform ${
         isHovered ? 'shadow-xl' : ''
@@ -68,26 +69,28 @@ export default function TableCard({
       {/* Botón de Editar (arriba izq) */}
       <button
         onClick={onEdit}
-        className="absolute top-3 left-3 p-2 rounded-lg flex items-center justify-center gap-2 bg-white shadow-md hover:bg-gray-50 transition-colors duration-200 z-10 group/edit"
+        className="absolute top-3 left-3 p-2  px-4 hover:cursor-pointer rounded-full flex items-center justify-center gap-2 bg-white shadow-md hover:bg-gray-50 transition-colors duration-200 z-10 group/edit"
         aria-label="Editar mesa"
       >
         <Pencil
           size={18}
           className="text-gray-600 group-hover/edit:text-blue-600 transition-colors"
         />{' '}
-        Editar
+        <span className="hidden sm:inline text-sm font-medium text-gray-700 group-hover/edit:text-blue-600 transition-colors">
+          Editar
+        </span>
       </button>
 
       {/* Chip de Estado (arriba der) */}
       <span
-        className={`absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-full ${statusConfig.light} ${statusConfig.text} border ${statusConfig.border}`}
+        className={`absolute top-3 right-3 text-xs font-semibold px-2.5 py-1 rounded-full ${statusConfig.light} ${statusConfig.text} border ${statusConfig.border} uppercase`}
       >
         {status}
       </span>
 
       {/* SVG de la mesa como fondo con color según estado */}
       <div className="absolute inset-0 flex items-center justify-center opacity-20">
-        {shape === 'circle' && <image href={TABLE_ROUNDED} className="w-96" />}
+        {shape === 'circle' && <img src={TABLE_ROUNDED} className="w-60" />}
         {shape === 'square' && (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -163,14 +166,12 @@ export default function TableCard({
 
       {/* Contenido principal - Número de mesa destacado */}
       <div className="relative text-center z-10">
-        <h3 className="text-3xl font-extrabold text-gray-800 mb-2">
-          Mesa # {code}
+        <h3 className="text-3xl font-extrabold text-gray-800 mb-2 line-clamp-1">
+          {name}
         </h3>
-        {/* <div
-          className={`mb-2 inline-flex items-center justify-center w-14 h-14 rounded-full ${statusConfig.bg} text-white shadow-md`}
-        >
-          <span className="text-xl font-bold">{name}</span>
-        </div> */}
+        <p className=" text-gray-800 text-lg">
+          Código: <span className="font-semibold ">{code}</span>
+        </p>
 
         <p className=" text-gray-800 mt-1 text-lg">
           Capacidad:{' '}

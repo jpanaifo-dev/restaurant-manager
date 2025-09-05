@@ -103,7 +103,18 @@ const TablesPage: React.FC = () => {
       />
 
       {loading ? (
-        <p>Cargando mesas...</p>
+        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, idx) => (
+            <div
+              key={idx}
+              className="animate-pulse bg-gray-200 rounded-lg h-32 w-full flex flex-col justify-center items-center"
+            >
+              <div className="h-6 w-2/3 bg-gray-300 rounded mb-2" />
+              <div className="h-4 w-1/2 bg-gray-300 rounded mb-1" />
+              <div className="h-4 w-1/3 bg-gray-300 rounded" />
+            </div>
+          ))}
+        </div>
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {tables.map((table) => (

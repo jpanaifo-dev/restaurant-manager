@@ -1,4 +1,5 @@
-import React from 'react'
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { tableSchema, type TableFormData } from '../../schemas/tableSchema'
@@ -29,11 +30,30 @@ const TableForm: React.FC<TableFormProps> = ({
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<TableFormData>({
     resolver: zodResolver(tableSchema),
-    defaultValues,
+    defaultValues: {
+      capacity: defaultValues?.capacity,
+      status: defaultValues?.status || 'libre',
+      name: defaultValues?.name || '',
+      code: defaultValues?.code || '',
+    },
   })
+
+  useEffect(() => {
+    // Reset form when defaultValues change
+    console.log('defaultValues changed:', defaultValues)
+    if (defaultValues) {
+      Object.keys(defaultValues).forEach((key) => {
+        setValue(
+          key as keyof TableFormData,
+          defaultValues[key as keyof TableFormData]
+        )
+      })
+    }
+  }, [defaultValues, register])
 
   return (
     <Modal show={open} onClose={onClose}>
@@ -51,7 +71,9 @@ const TableForm: React.FC<TableFormProps> = ({
           </div>
 
           <div className="space-y-2">
-            <Label className="block text-base">Capacidad</Label>
+            <Label className="block text-base">
+              Capacidad (número de personas)
+            </Label>
             <TextInput
               type="number"
               {...register('capacity', { valueAsNumber: true })}
@@ -71,10 +93,7 @@ const TableForm: React.FC<TableFormProps> = ({
 
           <div>
             <Label className="block text-base">Estado</Label>
-            <Select
-              {...register('status')}
-              className="w-full border p-2 rounded"
-            >
+            <Select {...register('status')}>
               <option value="libre">Libre</option>
               <option value="ocupada">Ocupada</option>
               <option value="reservada">Reservada</option>

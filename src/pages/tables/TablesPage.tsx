@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import supabase from '../../utils/supabase'
 import { type TableFormData } from '../../schemas/tableSchema'
-import { Pencil, Refresh } from 'tabler-icons-react'
+import { Pencil, Plus, Refresh } from 'tabler-icons-react'
 import { TableForm } from '../../components/form'
 import { Button } from 'flowbite-react'
 
@@ -69,15 +69,16 @@ const TablesPage: React.FC = () => {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Gestión de Mesas</h1>
 
-      <button
+      <Button
         onClick={() => {
-          setShowForm(!showForm)
+          setShowForm(true)
           setEditingTable(null)
         }}
         className="mb-4 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
-        {showForm ? 'Cancelar' : 'Agregar Mesa'}
-      </button>
+        <Plus size={16} className="mr-2" />
+        Agregar Mesa
+      </Button>
 
       <TableForm
         open={showForm}

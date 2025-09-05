@@ -44,7 +44,6 @@ const TableForm: React.FC<TableFormProps> = ({
 
   useEffect(() => {
     // Reset form when defaultValues change
-    console.log('defaultValues changed:', defaultValues)
     if (defaultValues) {
       Object.keys(defaultValues).forEach((key) => {
         setValue(

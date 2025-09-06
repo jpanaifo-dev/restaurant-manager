@@ -44,3 +44,10 @@ export interface OrderItem {
   url_image?: string
   product?: Product
 }
+
+export interface TableWithDetails extends Table {
+  current_order?: Order & {
+    user: User
+    order_items: (OrderItem & { product: Product })[]
+  }
+}

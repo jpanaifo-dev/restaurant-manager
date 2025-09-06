@@ -22,3 +22,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Testing
+/coverage
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# .env files
+.env
+.env.test
+.env.production

@@ -139,12 +139,11 @@ const TablesView: React.FC = () => {
 
   return (
     <div className="p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Gestión de Mesas</h1>
-        <Button color="blue">
-          <Plus size={16} className="mr-2" />
-          Nueva Mesa
-        </Button>
+      <div className="flex flex-col my-4">
+        <h1 className="text-2xl font-bold">Bienvenido al Panel de Mesas</h1>
+        <p className="text-gray-600">
+          Aquí puedes gestionar las mesas y sus órdenes de manera eficiente.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

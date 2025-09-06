@@ -11,7 +11,9 @@ export const ProtectedLayout = ({
   if (loading)
     return (
       <div className="flex h-screen items-center justify-center">
-        Cargando...
+        <p className="animate-pulse text-3xl font-medium text-gray-600">
+          Cargando...
+        </p>
       </div>
     )
   if (!user) return <Navigate to="/login" replace />

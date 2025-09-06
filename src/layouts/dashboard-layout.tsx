@@ -1,5 +1,6 @@
 import Footer from '../components/layout/Footer'
 import Navbar from '../components/layout/Navbar'
+import { ProtectedLayout } from './protected-layout'
 
 interface DashboardLayoutProps {
   children: React.ReactNode
@@ -8,11 +9,13 @@ interface DashboardLayoutProps {
 export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   return (
     <>
-      <Navbar />
-      <div className="min-h-screen flex flex-col py-4 bg-gray-100 text-gray-800 w-full md:py-8 lg:pt-12">
-        {children}
-      </div>
-      <Footer />
+      <ProtectedLayout>
+        <Navbar />
+        <div className="min-h-screen flex flex-col py-4 bg-gray-100 text-gray-800 w-full md:py-8 lg:pt-12">
+          {children}
+        </div>
+        <Footer />
+      </ProtectedLayout>
     </>
   )
 }

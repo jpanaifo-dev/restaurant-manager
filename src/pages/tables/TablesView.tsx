@@ -32,7 +32,6 @@ const TablesView: React.FC = () => {
         .select('*')
         .neq('status', 'en mantenimiento')
         .order('name')
-
       if (tablesError) throw tablesError
       // Obtener órdenes activas (que no están cerradas)
       const { data: ordersData, error: ordersError } = await supabase
@@ -42,12 +41,12 @@ const TablesView: React.FC = () => {
           *,
           user:users(*),
           order_items(
-            *,
-            product:products(*)
+        *,
+        product:products(*)
           )
         `
         )
-        .in('status', ['en preparación', 'servido', 'pendiente de pago'])
+        .in('status', ['preparing', 'served', 'pending_payment'])
         .order('created_at', { ascending: false })
 
       if (ordersError) throw ordersError

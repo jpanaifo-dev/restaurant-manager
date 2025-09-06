@@ -6,7 +6,7 @@ import { Clock, CurrencyDollar, Edit } from 'tabler-icons-react'
 import { useNavigate } from 'react-router-dom'
 import type { OrderItem, Product, TableWithDetails } from '../../types/supabase'
 import { APP_URL } from '../../libs/config.url'
-// import { TABLE_ROUNDED } from '../../assets'
+import { TABLE_ORDER } from '../../assets'
 
 interface TableCardProps {
   table: TableWithDetails
@@ -114,10 +114,10 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
     <Card
       className={`relative overflow-hidden hover:shadow-xl transform hover:cursor-pointer border-2 ${
         table.status === 'ocupada'
-          ? 'border-yellow-400 bg-yellow-100'
+          ? 'border-yellow-400 bg-yellow-50 hover:bg-yellow-100/60'
           : table.status === 'reservada'
-          ? 'border-purple-400 bg-purple-100'
-          : 'border-green-400 bg-green-100'
+          ? 'border-purple-400 bg-purple-100 hover:bg-purple-200/60'
+          : 'border-green-400 bg-green-100 hover:bg-green-200/60'
       }`}
       onClick={handleOrderRedirect}
     >
@@ -153,7 +153,7 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
 
             {/* Monto y Estado */}
             <div className="flex justify-between items-center flex-col gap-1">
-              <span className="text-2xl font-bold text-orange-600">
+              <span className="text-2xl font-extrabold text-orange-600">
                 {new Intl.NumberFormat('es-PE', {
                   style: 'currency',
                   currency: 'PEN',
@@ -172,10 +172,14 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
           </div>
         </div>
       ) : (
-        <div className="h-20 flex items-center justify-center my-3 bg-gray-100 rounded-lg">
+        <div className="h-20 flex items-center justify-center my-3 bg-gray-100/70 rounded-lg">
           <p className="text-gray-400 text-sm">Mesa disponible</p>
         </div>
       )}
+
+      <div className="absolute bottom-0 left-0 right-0 flex justify-center opacity-10">
+        <img src={TABLE_ORDER} className="w-60" />
+      </div>
 
       <div className="mt-4 flex space-x-2">
         {table.status === 'libre' && (

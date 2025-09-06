@@ -1,7 +1,11 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
-const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
+export const ProtectedLayout = ({
+  children,
+}: {
+  children: React.ReactNode
+}) => {
   const { user, loading } = useAuth()
 
   if (loading)
@@ -14,5 +18,3 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 
   return <>{children}</>
 }
-
-export default ProtectedLayout

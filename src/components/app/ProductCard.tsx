@@ -1,5 +1,4 @@
 // components/ProductCard.tsx
-import { Pencil, Refresh } from 'tabler-icons-react'
 import { useState } from 'react'
 
 interface ProductCardProps {
@@ -13,7 +12,7 @@ interface ProductCardProps {
   stock: number
   url_image: string | null
   onEdit: () => void
-  onToggle: () => void
+  onAddSideDish?: () => void
 }
 
 export default function ProductCard({
@@ -22,10 +21,9 @@ export default function ProductCard({
   base_price,
   status,
   category_name,
-  stock,
   url_image,
   onEdit,
-  onToggle,
+  onAddSideDish,
 }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -51,7 +49,7 @@ export default function ProductCard({
 
   return (
     <div
-      className={`relative w-full h-80 rounded-xl border-2 ${
+      className={`relative w-full rounded-xl border-2 ${
         statusConfig.border
       } shadow-lg bg-white flex flex-col overflow-hidden transition-all duration-300 transform ${
         isHovered ? 'shadow-xl' : ''
@@ -60,12 +58,12 @@ export default function ProductCard({
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Imagen del producto */}
-      <div className="h-40 bg-gray-200 overflow-hidden">
+      <div className="h-48 bg-gray-200 overflow-hidden min-h-48">
         {url_image ? (
           <img
             src={url_image}
             alt={name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover min-h-40"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -73,21 +71,6 @@ export default function ProductCard({
           </div>
         )}
       </div>
-
-      {/* Botón de Editar (arriba izq) */}
-      <button
-        onClick={onEdit}
-        className="absolute top-3 left-3 p-2 px-4 hover:cursor-pointer rounded-full flex items-center justify-center gap-2 bg-white shadow-md hover:bg-gray-50 transition-colors duration-200 z-10 group/edit"
-        aria-label="Editar producto"
-      >
-        <Pencil
-          size={18}
-          className="text-gray-600 group-hover/edit:text-blue-600 transition-colors"
-        />{' '}
-        <span className="hidden sm:inline text-sm font-medium text-gray-700 group-hover/edit:text-blue-600 transition-colors">
-          Editar
-        </span>
-      </button>
 
       {/* Chip de Estado (arriba der) */}
       <span
@@ -98,46 +81,48 @@ export default function ProductCard({
 
       {/* Contenido del producto */}
       <div className="p-4 flex flex-col flex-grow">
-        <h3 className="text-lg font-bold text-gray-800 mb-1 line-clamp-1">
+        {category_name && (
+          <div>
+            <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full">
+              {category_name}
+            </span>
+          </div>
+        )}
+        <h3 className="text-lg font-extrabold text-gray-800 mb-1 line-clamp-1">
           {name}
         </h3>
 
         {description && (
-          <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+          <p className="text-xs text-gray-600 mb-2 line-clamp-2">
             {description}
           </p>
         )}
 
         <div className="mt-auto">
-          <p className="text-lg font-bold text-blue-600">
-            ${base_price.toFixed(2)}
+          <p className="text-2xl font-bold text-orange-600">
+            {new Intl.NumberFormat('es-PE', {
+              style: 'currency',
+              currency: 'PEN',
+              minimumFractionDigits: 2,
+            }).format(base_price)}
           </p>
+        </div>
 
-          <div className="flex justify-between items-center mt-2">
-            <span className="text-sm text-gray-600">
-              Stock: <span className="font-semibold">{stock}</span>
-            </span>
-
-            {category_name && (
-              <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                {category_name}
-              </span>
-            )}
-          </div>
+        <div className="mt-2 grid grid-cols-2 gap-2 z-30">
+          <button
+            onClick={onEdit}
+            className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm hover:cursor-pointer"
+          >
+            Editar
+          </button>
+          <button
+            onClick={onAddSideDish}
+            className="border border-blue-600 text-blue-700 w-full py-2 px-4 rounded-md hover:bg-blue-50 transition-colors duration-200 text-sm hover:cursor-pointer"
+          >
+            Acompañamientos
+          </button>
         </div>
       </div>
-
-      {/* Botón Cambiar Estado (solo icono, abajo der) */}
-      <button
-        onClick={onToggle}
-        className="absolute bottom-3 right-3 p-2 rounded-full bg-white shadow-md hover:bg-gray-50 transition-colors duration-200 z-10 group/refresh"
-        aria-label="Cambiar estado"
-      >
-        <Refresh
-          size={18}
-          className="text-gray-600 group-hover/refresh:rotate-180 transition-transform group-hover/refresh:text-blue-600"
-        />
-      </button>
 
       {/* Efecto de superposición al pasar el mouse */}
       {isHovered && (

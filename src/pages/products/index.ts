@@ -1,3 +1,4 @@
 import CategoriesPage from './CategoriesPage'
+import ProductsPage from './ProductsPage'
 
-export { CategoriesPage }
+export { CategoriesPage, ProductsPage }

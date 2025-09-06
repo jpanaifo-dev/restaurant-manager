@@ -17,6 +17,7 @@ import {
   TextInput,
   Select,
   Textarea,
+  Checkbox,
 } from 'flowbite-react'
 import supabase from '../../utils/supabase'
 
@@ -25,6 +26,7 @@ interface ProductFormProps {
   onClose: () => void
   onSubmit: (data: ProductFormData) => void
   defaultValues?: ProductFormData
+  isDisabled?: boolean
 }
 
 interface Category {
@@ -37,8 +39,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
   onClose,
   onSubmit,
   defaultValues,
+  isDisabled,
 }) => {
   const [categories, setCategories] = useState<Category[]>([])
+  const [showStock, setShowStock] = useState(false)
+
   const {
     register,
     handleSubmit,
@@ -68,6 +73,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
   useEffect(() => {
     if (defaultValues) {
       reset(defaultValues)
+      // Determinar si mostrar u ocultar el campo stock basado en los valores por defecto
+      setShowStock(typeof defaultValues.stock === 'number')
     } else {
       reset({
         name: '',
@@ -75,9 +82,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
         base_price: 0,
         status: 'activo',
         category_id: undefined,
-        stock: 0,
+        stock: undefined,
         url_image: '',
       })
+      setShowStock(false)
     }
   }, [defaultValues, reset, open])
 
@@ -127,6 +135,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
               <TextInput
                 id="base_price"
                 type="number"
+                min={0}
                 step="0.01"
                 {...register('base_price', { valueAsNumber: true })}
               />
@@ -138,16 +147,36 @@ const ProductForm: React.FC<ProductFormProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="stock" className="block text-base">
-                Stock
-              </Label>
-              <TextInput
-                id="stock"
-                type="number"
-                {...register('stock', { valueAsNumber: true })}
-              />
-              {errors.stock && (
-                <p className="text-red-500 text-sm">{errors.stock.message}</p>
+              <div className="flex items-center gap-2 mb-2">
+                <Checkbox
+                  id="add_stock"
+                  checked={showStock}
+                  onChange={(e) => setShowStock(e.target.checked)}
+                />
+                <Label htmlFor="add_stock" className="cursor-pointer">
+                  Agregar stock
+                </Label>
+              </div>
+
+              {showStock && (
+                <>
+                  <Label htmlFor="stock" className="block text-base">
+                    Cantidad de stock
+                  </Label>
+                  <TextInput
+                    id="stock"
+                    type="number"
+                    {...register('stock', {
+                      valueAsNumber: true,
+                      setValueAs: (v) => (v === '' ? undefined : Number(v)),
+                    })}
+                  />
+                  {errors.stock && (
+                    <p className="text-red-500 text-sm">
+                      {errors.stock.message}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -208,6 +237,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             <Button
               type="submit"
               className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+              disabled={isDisabled}
             >
               Guardar
             </Button>

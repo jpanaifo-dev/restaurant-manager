@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // pages/ProductsPage.tsx
 import React, { useEffect, useState } from 'react'
 import supabase from '../../utils/supabase'
@@ -5,10 +6,14 @@ import {
   type ProductFormData,
   type ProductStatus,
 } from '../../schemas/productSchema'
-import { Plus } from 'tabler-icons-react'
-import { ProductForm } from '../../components/form'
+import { type ProductOptionFormData } from '../../schemas/productOptionSchema'
+import { ExternalLink, Plus } from 'tabler-icons-react'
+import { ProductForm, ProductOptionForm } from '../../components/form'
 import { Button } from 'flowbite-react'
 import { ProductCard } from '../../components/app'
+import { useCategories } from '../../hooks/useCategories'
+import { Link, useSearchParams } from 'react-router-dom'
+import { APP_URL } from '../../libs/config.url'
 
 interface Product {
   id: number
@@ -24,11 +29,36 @@ interface Product {
   }
 }
 
+interface ProductOption {
+  id: number
+  name: string
+  additional_price: number
+  product_id: number | null
+  is_available: boolean
+}
+
 const ProductsPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([])
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
+  const [showOptionForm, setShowOptionForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [editingOption, setEditingOption] = useState<ProductOption | null>(null)
+  const [selectedProductId, setSelectedProductId] = useState<
+    number | undefined
+  >()
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isOptionSubmitting, setIsOptionSubmitting] = useState(false)
+  const [searchParams, setSearchParams] = useSearchParams()
+  const {
+    categories,
+    fetchCategories,
+    // loading: loadCategories,
+  } = useCategories()
+
+  // Obtener categoría actual de la URL
+  const currentCategory = searchParams.get('category') || 'all'
 
   // 🔹 Cargar productos desde Supabase
   const fetchProducts = async () => {
@@ -44,16 +74,34 @@ const ProductsPage: React.FC = () => {
       .order('id', { ascending: true })
 
     if (error) console.error('Error cargando productos:', error.message)
-    else setProducts(data as Product[])
+    else {
+      setProducts(data as Product[])
+      setFilteredProducts(data as Product[])
+    }
     setLoading(false)
   }
 
+  // 🔹 Filtrar productos por categoría
+  useEffect(() => {
+    if (currentCategory === 'all') {
+      setFilteredProducts(products)
+    } else {
+      const categoryId = parseInt(currentCategory)
+      const filtered = products.filter(
+        (product) => product.category_id === categoryId
+      )
+      setFilteredProducts(filtered)
+    }
+  }, [currentCategory, products])
+
   useEffect(() => {
     fetchProducts()
+    fetchCategories()
   }, [])
 
   // 🔹 Crear / actualizar producto
   const handleAddOrEditProduct = async (data: ProductFormData) => {
+    setIsSubmitting(true)
     if (editingProduct) {
       // Update
       const { error } = await supabase
@@ -69,17 +117,45 @@ const ProductsPage: React.FC = () => {
     setShowForm(false)
     setEditingProduct(null)
     fetchProducts()
+    setIsSubmitting(false)
   }
 
-  // 🔹 Cambiar estado de producto
-  const toggleStatus = async (product: Product) => {
-    const nextStatus = product.status === 'activo' ? 'inactivo' : 'activo'
-    const { error } = await supabase
-      .from('products')
-      .update({ status: nextStatus })
-      .eq('id', product.id)
-    if (error) console.error('Error cambiando estado:', error.message)
-    fetchProducts()
+  // 🔹 Crear / actualizar opción de producto
+  const handleAddOrEditOption = async (data: ProductOptionFormData) => {
+    setIsOptionSubmitting(true)
+    if (editingOption) {
+      // Update
+      const { error } = await supabase
+        .from('product_options')
+        .update(data)
+        .eq('id', editingOption.id)
+      if (error) console.error('Error actualizando opción:', error.message)
+    } else {
+      // Insert
+      const { error } = await supabase.from('product_options').insert([data])
+      if (error) console.error('Error insertando opción:', error.message)
+    }
+    setShowOptionForm(false)
+    setEditingOption(null)
+    setSelectedProductId(undefined)
+    setIsOptionSubmitting(false)
+  }
+
+  // 🔹 Manejar cambio de categoría
+  const handleCategoryChange = (categoryId: string) => {
+    if (categoryId === 'all') {
+      searchParams.delete('category')
+    } else {
+      searchParams.set('category', categoryId)
+    }
+    setSearchParams(searchParams)
+  }
+
+  // 🔹 Abrir formulario de opciones para un producto específico
+  const handleAddOption = (productId: number) => {
+    setSelectedProductId(productId)
+    setEditingOption(null)
+    setShowOptionForm(true)
   }
 
   return (
@@ -97,12 +173,63 @@ const ProductsPage: React.FC = () => {
         Agregar Producto
       </Button>
 
+      {/* Filtros de categoría */}
+      <div className="mb-6">
+        <div className="mb-4 flex items-center gap-4">
+          <h2 className="text-lg font-semibold">Filtrar por categoría</h2>
+          <span className="mx-1 text-gray-400">|</span>
+          <Link
+            to={APP_URL.MENUS.CATEGORIES}
+            className="text-blue-600 hover:underline text-sm"
+            target="_blank"
+          >
+            Gestionar Categorías
+            <ExternalLink size={14} className="inline-block ml-1" />
+          </Link>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {/* Card para "Todos" */}
+          <div
+            className={`w-24 h-24 rounded-lg border-2 flex flex-col items-center justify-center cursor-pointer transition-all ${
+              currentCategory === 'all'
+                ? 'bg-blue-100 border-blue-500'
+                : 'bg-white border-gray-200 hover:bg-gray-50'
+            }`}
+            onClick={() => handleCategoryChange('all')}
+          >
+            <div>
+              <span className="text-3xl">{'📦'}</span>
+            </div>
+            <span className="text-center font-medium">Todos</span>
+          </div>
+
+          {/* Cards para cada categoría */}
+          {categories.map((category) => (
+            <div
+              key={category.id}
+              className={`px-4 h-24 rounded-lg border-2 flex flex-col items-center justify-center cursor-pointer transition-all ${
+                currentCategory === category.id.toString()
+                  ? 'bg-blue-100 border-blue-500'
+                  : 'bg-white border-gray-200 hover:bg-gray-50'
+              }`}
+              onClick={() => handleCategoryChange(category.id.toString())}
+            >
+              <div>
+                <span className="text-3xl">{category.icon || '📦'}</span>
+              </div>
+              <span className="text-center font-medium">{category.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <ProductForm
         open={showForm}
         onClose={() => {
           setShowForm(false)
           setEditingProduct(null)
         }}
+        isDisabled={isSubmitting}
         onSubmit={handleAddOrEditProduct}
         defaultValues={
           editingProduct
@@ -117,6 +244,19 @@ const ProductsPage: React.FC = () => {
               }
             : undefined
         }
+      />
+
+      <ProductOptionForm
+        open={showOptionForm}
+        onClose={() => {
+          setShowOptionForm(false)
+          setEditingOption(null)
+          setSelectedProductId(undefined)
+        }}
+        isDisabled={isOptionSubmitting}
+        onSubmit={handleAddOrEditOption}
+        defaultValues={editingOption || undefined}
+        productId={selectedProductId}
       />
 
       {loading ? (
@@ -134,7 +274,7 @@ const ProductsPage: React.FC = () => {
         </div>
       ) : (
         <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}
               id={product.id}
@@ -150,7 +290,7 @@ const ProductsPage: React.FC = () => {
                 setEditingProduct(product)
                 setShowForm(true)
               }}
-              onToggle={() => toggleStatus(product)}
+              onAddSideDish={() => handleAddOption(product.id)}
             />
           ))}
         </div>

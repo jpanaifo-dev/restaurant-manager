@@ -1,44 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import supabase from '../../utils/supabase'
 import { type CategoryFormData } from '../../schemas/categorySchema'
 import { Plus } from 'tabler-icons-react'
 import { CategoryForm } from '../../components/form'
 import { Button } from 'flowbite-react'
 import { CategoryCard } from '../../components/app'
-
-interface Category {
-  id: number
-  name: string
-  status: 'activa' | 'inactiva'
-  color: string
-  icon: string
-}
+import { useCategories, type Category } from '../../hooks/useCategories'
 
 const CategoriesPage: React.FC = () => {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
-
-  // 🔹 Cargar categorías desde Supabase
-  const fetchCategories = async () => {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name', { ascending: true })
-
-    if (error) {
-      console.error('Error cargando categorías:', error.message)
-    } else {
-      setCategories(data as Category[])
-    }
-    setLoading(false)
-  }
-
-  useEffect(() => {
-    fetchCategories()
-  }, [])
+  const { loading, categories, fetchCategories } = useCategories()
 
   // 🔹 Crear / actualizar categoría
   const handleAddOrEditCategory = async (data: CategoryFormData) => {

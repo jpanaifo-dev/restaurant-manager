@@ -27,10 +27,10 @@ const Footer: React.FC = () => {
   const location = useLocation()
 
   return (
-    <footer className="fixed inset-x-0 bottom-4 z-50">
-      <div className="mx-auto px-4">
+    <footer className="sticky inset-x-0 bottom-4 z-50">
+      <div className="mx-auto px-4 flex justify-center gap-4 items-center">
         {/*Section logout*/}
-        <div className="fixed bottom-4 left-4 bg-white/90 backdrop-blur-md shadow-lg rounded-lg p-4 min-h-24 min-w-32 flex items-center justify-center">
+        <div className=" bottom-4 left-4 bg-white/90 backdrop-blur-md shadow-lg rounded-lg p-4 min-h-24 min-w-32 flex items-center justify-center">
           <button className="flex flex-col items-center bg-gray-600 text-white px-4 py-6 rounded-lg hover:bg-gray-700 transition gap-3">
             <Logout size={24} />
             <span>Cerrar Sesión</span>
@@ -39,7 +39,7 @@ const Footer: React.FC = () => {
         {/*Section navigation*/}
         <nav
           style={{ left: 'calc(8rem + 4rem)' }}
-          className="fixed bottom-4 right-4 transform
+          className="bottom-4 right-4 transform
         bg-white/90 backdrop-blur-md shadow-lg rounded-lg p-4 min-h-32 min-w-32 flex items-center justify-center gap-6"
         >
           <ul className="grid grid-cols-6 gap-4">

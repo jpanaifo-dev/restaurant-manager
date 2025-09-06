@@ -5,8 +5,8 @@ import {
   Logout,
   BrandAirtable,
   Checklist,
-  Dashboard,
   LayoutGrid,
+  Door,
   Printer,
   Soup,
 } from 'tabler-icons-react'
@@ -15,11 +15,11 @@ import { APP_URL } from '../../libs/config.url'
 import { useLocation } from 'react-router-dom'
 
 const navItems = [
+  { to: APP_URL.DASHBOARD.BASE, label: 'Dashboard', Icon: LayoutGrid },
   { to: APP_URL.TABLES.BASE, label: 'Mesas', Icon: BrandAirtable },
   { to: APP_URL.MENUS.BASE, label: 'Menus', Icon: Soup },
   { to: APP_URL.ORDERS.BASE, label: 'Pedidos', Icon: Checklist },
-  { to: APP_URL.DASHBOARD.BASE, label: 'Dashboard', Icon: Dashboard },
-  { to: APP_URL.ALMACEN.BASE, label: 'Almacen', Icon: LayoutGrid },
+  { to: APP_URL.ALMACEN.BASE, label: 'Almacen', Icon: Door },
   { to: APP_URL.PRINTER.BASE, label: 'Imprimir', Icon: Printer },
 ]
 

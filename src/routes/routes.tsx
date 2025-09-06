@@ -1,7 +1,6 @@
 // src/Routes.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { DashboardPage } from '../pages/dashboard/DashboardPage'
-import { TablesPage } from '../pages/tables'
+import { TablesPage, TablesView } from '../pages/tables'
 import { CategoriesPage, ProductsPage } from '../pages/products'
 import { DashboardLayout } from '../layouts'
 import { APP_URL } from '../libs/config.url'
@@ -15,7 +14,7 @@ const AppRoutes = () => {
           path="/"
           element={
             <DashboardLayout>
-              <DashboardPage />
+              <TablesView />
             </DashboardLayout>
           }
         />

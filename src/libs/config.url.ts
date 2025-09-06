@@ -14,7 +14,7 @@ export const APP_URL = {
     BASE: '/settings',
   },
   DASHBOARD: {
-    BASE: '/dashboard',
+    BASE: '/',
   },
   ALMACEN: {
     BASE: '/almacen',

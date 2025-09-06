@@ -9,7 +9,7 @@ import type {
 } from '../../types/supabase'
 import supabase from '../../utils/supabase'
 import { Badge, Card, Button } from 'flowbite-react'
-import { Clock, Users, User as UserIcon, Plus } from 'tabler-icons-react'
+import { Clock, Users, User as UserIcon } from 'tabler-icons-react'
 
 interface TableWithDetails extends Table {
   current_order?: Order & {

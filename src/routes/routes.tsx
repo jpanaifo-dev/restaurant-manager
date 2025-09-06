@@ -2,6 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { TablesPage, TablesView } from '../pages/tables'
 import { CategoriesPage, ProductsPage } from '../pages/products'
+import { LoginPage } from '../pages/auth'
 import { DashboardLayout } from '../layouts'
 import { APP_URL } from '../libs/config.url'
 
@@ -46,6 +47,9 @@ const AppRoutes = () => {
             </DashboardLayout>
           }
         />
+
+        {/* Ruta para la página de login */}
+        <Route path={APP_URL.AUTH.LOGIN} element={<LoginPage />} />
 
         {/* Ruta para páginas no encontradas */}
         <Route

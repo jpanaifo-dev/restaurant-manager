@@ -1,4 +1,7 @@
 export const APP_URL = {
+  AUTH: {
+    LOGIN: '/login',
+  },
   TABLES: {
     BASE: '/tables',
   },

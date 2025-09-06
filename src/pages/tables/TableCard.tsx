@@ -58,7 +58,7 @@ export default function TableCard({
 
   return (
     <div
-      className={`relative w-full h-64 rounded-xl border-2 ${
+      className={`relative w-full h-52 rounded-xl border-2 ${
         statusConfig.border
       } shadow-lg bg-white flex items-center justify-center overflow-hidden transition-all duration-300 transform ${
         isHovered ? 'shadow-xl' : ''
@@ -166,14 +166,14 @@ export default function TableCard({
 
       {/* Contenido principal - Número de mesa destacado */}
       <div className="relative text-center z-10">
-        <h3 className="text-3xl font-extrabold text-gray-800 mb-2 line-clamp-1">
+        <h3 className="text-2xl font-extrabold text-gray-800 mb-2 line-clamp-1">
           {name}
         </h3>
-        <p className=" text-gray-800 text-lg">
+        <p className=" text-gray-800 text-base">
           Código: <span className="font-semibold ">{code}</span>
         </p>
 
-        <p className=" text-gray-800 mt-1 text-lg">
+        <p className=" text-gray-800 mt-1 text-base">
           Capacidad:{' '}
           <span className="font-semibold ">{capacity} persona(s)</span>
         </p>

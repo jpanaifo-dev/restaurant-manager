@@ -129,7 +129,11 @@ const ProductOptionForm: React.FC<ProductOptionFormProps> = ({
   }, [defaultValues, reset, open, productId])
 
   const handleFormSubmit = async (data: ProductOptionFormData) => {
-    await onSubmit(data)
+    const dataToSubmit = {
+      ...data,
+      id: isEditing && selectedOption ? selectedOption.id : undefined,
+    }
+    await onSubmit(dataToSubmit)
     // Recargar la lista después de guardar
     if (productId) {
       fetchProductOptions()
@@ -251,7 +255,10 @@ const ProductOptionForm: React.FC<ProductOptionFormProps> = ({
                         <Button
                           size="xs"
                           color="failure"
-                          onClick={() => setIsConfirmingDelete(true)}
+                          onClick={() => {
+                            setSelectedOption(option)
+                            setIsConfirmingDelete(true)
+                          }}
                         >
                           <Trash size={14} />
                         </Button>

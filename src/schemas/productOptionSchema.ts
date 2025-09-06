@@ -2,6 +2,7 @@
 import { z } from 'zod'
 
 export const productOptionSchema = z.object({
+  id: z.number().optional(),
   name: z.string().min(1, 'El nombre es requerido'),
   additional_price: z
     .number()

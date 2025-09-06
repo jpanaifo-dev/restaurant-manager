@@ -123,12 +123,13 @@ const ProductsPage: React.FC = () => {
   // 🔹 Crear / actualizar opción de producto
   const handleAddOrEditOption = async (data: ProductOptionFormData) => {
     setIsOptionSubmitting(true)
-    if (editingOption) {
+    if (data.id) {
+      const { id: dataOptionId, ...dataUpdate } = data
       // Update
       const { error } = await supabase
         .from('product_options')
-        .update(data)
-        .eq('id', editingOption.id)
+        .update(dataUpdate)
+        .eq('id', dataOptionId)
       if (error) console.error('Error actualizando opción:', error.message)
     } else {
       // Insert

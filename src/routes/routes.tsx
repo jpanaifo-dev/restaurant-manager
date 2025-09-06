@@ -1,8 +1,10 @@
 // src/Routes.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { DashboardPage } from '../pages/dashboard/DashboardPage'
-// import TablePage from '../features/tables/TablePage'
+import { TablesPage } from '../pages/tables'
+import { CategoriesPage } from '../pages/products'
 import { DashboardLayout } from '../layouts'
+import { APP_URL } from '../libs/config.url'
 
 const AppRoutes = () => {
   return (
@@ -14,6 +16,24 @@ const AppRoutes = () => {
           element={
             <DashboardLayout>
               <DashboardPage />
+            </DashboardLayout>
+          }
+        />
+        {/* Ruta para la página de tablas */}
+        <Route
+          path={APP_URL.TABLES.BASE}
+          element={
+            <DashboardLayout>
+              <TablesPage />
+            </DashboardLayout>
+          }
+        />
+        {/* Ruta para la página de categorías */}
+        <Route
+          path={APP_URL.MENUS.CATEGORIES}
+          element={
+            <DashboardLayout>
+              <CategoriesPage />
             </DashboardLayout>
           }
         />

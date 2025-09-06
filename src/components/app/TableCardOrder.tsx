@@ -92,14 +92,28 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
   // Obtener color para el estado de la orden
   const getOrderStatusColor = (status: string): string => {
     switch (status) {
-      case 'en preparación':
+      case 'preparing':
         return 'warning'
-      case 'servido':
+      case 'served':
         return 'success'
-      case 'pendiente de pago':
+      case 'pending_payment':
         return 'purple'
       default:
         return 'gray'
+    }
+  }
+
+  // Obtener el estado de la orden y convertirlo a español
+  const getOrderStatusText = (status: string): string => {
+    switch (status) {
+      case 'preparing':
+        return 'En preparación'
+      case 'served':
+        return 'Servido'
+      case 'pending_payment':
+        return 'Pendiente de pago'
+      default:
+        return status
     }
   }
 
@@ -166,7 +180,7 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
                 color={getOrderStatusColor(table.current_order.status)}
                 className="text-xs rounded-full"
               >
-                {table.current_order.status.toUpperCase()}
+                {getOrderStatusText(table.current_order.status)}
               </Badge>
             </div>
           </div>

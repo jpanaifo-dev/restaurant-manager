@@ -13,6 +13,7 @@ export const APP_URL = {
     BASE: '/orders',
     DETAIL: (orderId: string) => `/orders/${orderId}`,
     CREATE: (tableId: string) => `/orders/create/${tableId}`,
+    PATH_CREATE: '/orders/create/:id',
   },
   SETTINGS: {
     BASE: '/settings',

@@ -1,3 +1,4 @@
 import OrdersHistoryPage from './OrdersHistoryPage'
+import OrderCreatePage from './OrderCreatePage'
 
-export { OrdersHistoryPage }
+export { OrdersHistoryPage, OrderCreatePage }

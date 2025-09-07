@@ -86,6 +86,20 @@ const OrderCreatePage: React.FC = () => {
     return Date.now().toString(36) + Math.random().toString(36).substring(2)
   }
 
+  const fetchProductOptions = async () => {
+    const { data: optionsData, error: optionsError } = await supabase
+      .from('product_options')
+      .select('*')
+      .eq('status', 'active')
+      .order('name')
+
+    if (optionsError) {
+      console.error('Error loading product options:', optionsError)
+    } else {
+      setProductOptions(optionsData || [])
+    }
+  }
+
   const fetchData = async () => {
     setLoading(true)
 
@@ -160,28 +174,14 @@ const OrderCreatePage: React.FC = () => {
     setLoading(false)
   }
 
-  const fetchProductOptions = async () => {
-    const { data: optionsData, error: optionsError } = await supabase
-      .from('product_options')
-      .select('*')
-      .eq('status', 'active')
-      .order('name')
-
-    if (optionsError) {
-      console.error('Error loading product options:', optionsError)
-    } else {
-      setProductOptions(optionsData || [])
-    }
-  }
+  // Cargar opciones de productos
+  useEffect(() => {
+    fetchProductOptions()
+  }, [tableId, orderId])
 
   // Cargar categorías y productos
   useEffect(() => {
     fetchData()
-  }, [tableId, orderId])
-
-  // Cargar opciones de productos
-  useEffect(() => {
-    fetchProductOptions()
   }, [tableId, orderId])
 
   // Filtrar productos por categoría

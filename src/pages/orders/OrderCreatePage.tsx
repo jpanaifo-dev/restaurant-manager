@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import supabase from '../../utils/supabase'
-import {
-  Button,
-  CheckIcon,
-  Toast,
-  ToastToggle,
-  Modal,
-  ModalBody,
-  ModalHeader,
-} from 'flowbite-react'
+import { Button, Modal, ModalBody, ModalHeader } from 'flowbite-react'
 import { useAuth } from '../../hooks/useAuth'
 import { APP_URL } from '../../libs/config.url'
 import { SidebarCategories } from './SidebarCategories'
 import { OrderProduct } from './OrderProduct'
+import { toast } from 'react-toastify'
+import { Loader } from 'tabler-icons-react'
 
 interface Category {
   id: number
@@ -78,8 +72,6 @@ const OrderCreatePage: React.FC = () => {
   const [discount, setDiscount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
-
-  const [showToast, setShowToast] = useState(false)
 
   const selectedCategory = searchParams.get('category') || 'all'
 
@@ -341,8 +333,9 @@ const OrderCreatePage: React.FC = () => {
           .eq('id', tableId)
       }
 
+      toast.success('Orden procesada con éxito')
+
       if (itemsError) throw itemsError
-      setShowToast(true)
       navigate(APP_URL.DASHBOARD.BASE)
     } catch (error) {
       console.error('Error saving order:', error)
@@ -516,6 +509,9 @@ const OrderCreatePage: React.FC = () => {
               onClick={confirmOrder}
               disabled={isSaving}
             >
+              {isSaving && (
+                <Loader size={16} className="inline mr-2 animate-spin" />
+              )}
               {orderId ? 'Actualizar' : 'Confirmar'} Pedido
             </Button>
           </div>
@@ -613,18 +609,6 @@ const OrderCreatePage: React.FC = () => {
             </div>
           </ModalBody>
         </Modal>
-      )}
-
-      {showToast && (
-        <Toast>
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-            <CheckIcon className="h-5 w-5" />
-          </div>
-          <div className="ml-3 text-sm font-normal">
-            ¡Orden procesada con éxito!
-          </div>
-          <ToastToggle />
-        </Toast>
       )}
     </div>
   )

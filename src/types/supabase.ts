@@ -1,3 +1,5 @@
+import type { User } from './user'
+
 // types/supabase.ts
 export interface Table {
   id: number
@@ -9,14 +11,6 @@ export interface Table {
   created_at?: string
 }
 
-export interface User {
-  id: number
-  name: string
-  role: 'mesero' | 'cajero' | 'administrador'
-  email?: string
-  phone?: string
-}
-
 export interface Order {
   id: number
   table_id: number
@@ -26,6 +20,7 @@ export interface Order {
   start_time: string
   end_time?: string
   user?: User
+  total?: number
 }
 
 export interface Product {
@@ -41,6 +36,13 @@ export interface OrderItem {
   product_id: number
   quantity: number
   notes?: string
+  sub_total: number
   url_image?: string
   product?: Product
+}
+
+export interface TableWithDetails extends Table {
+  current_order?: Order & {
+    user: User
+  }
 }

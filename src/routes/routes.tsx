@@ -2,6 +2,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { TablesPage, TablesView } from '../pages/tables'
 import { CategoriesPage, ProductsPage } from '../pages/products'
+import { OrdersHistoryPage, OrderCreatePage } from '../pages/orders'
+import { LoginPage } from '../pages/auth'
 import { DashboardLayout } from '../layouts'
 import { APP_URL } from '../libs/config.url'
 
@@ -46,6 +48,29 @@ const AppRoutes = () => {
             </DashboardLayout>
           }
         />
+
+        {/* Ruta para la página de historial de órdenes */}
+        <Route
+          path={APP_URL.ORDERS.BASE}
+          element={
+            <DashboardLayout>
+              <OrdersHistoryPage />
+            </DashboardLayout>
+          }
+        />
+
+        {/* Ruta para la página de creación de órdenes */}
+        <Route
+          path={APP_URL.ORDERS.PATH_CREATE}
+          element={
+            <DashboardLayout>
+              <OrderCreatePage />
+            </DashboardLayout>
+          }
+        />
+
+        {/* Ruta para la página de login */}
+        <Route path={APP_URL.AUTH.LOGIN} element={<LoginPage />} />
 
         {/* Ruta para páginas no encontradas */}
         <Route

@@ -1,4 +1,7 @@
 export const APP_URL = {
+  AUTH: {
+    LOGIN: '/login',
+  },
   TABLES: {
     BASE: '/tables',
   },
@@ -9,6 +12,9 @@ export const APP_URL = {
   ORDERS: {
     BASE: '/orders',
     DETAIL: (orderId: string) => `/orders/${orderId}`,
+    CREATE: (tableId: string) => `/orders/create/${tableId}`,
+    PATH_CREATE: '/orders/create/:tableId',
+    PATH_EDIT: '/orders/edit/:orderId',
   },
   SETTINGS: {
     BASE: '/settings',

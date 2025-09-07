@@ -132,8 +132,13 @@ const ProductsPage: React.FC = () => {
         .eq('id', dataOptionId)
       if (error) console.error('Error actualizando opción:', error.message)
     } else {
+      const dataUpdate = Object.fromEntries(
+        Object.entries(data).filter(([key]) => key !== 'id')
+      )
       // Insert
-      const { error } = await supabase.from('product_options').insert([data])
+      const { error } = await supabase
+        .from('product_options')
+        .insert([dataUpdate])
       if (error) console.error('Error insertando opción:', error.message)
     }
     setShowOptionForm(false)

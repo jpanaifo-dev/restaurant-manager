@@ -1,4 +1,5 @@
 import CategoryCard from './CategoryCard'
 import ProductCard from './ProductCard'
+import TableCardOrder from './TableCardOrder'
 
-export { CategoryCard, ProductCard }
+export { CategoryCard, ProductCard, TableCardOrder }

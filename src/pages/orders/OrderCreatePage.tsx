@@ -3,6 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import supabase from '../../utils/supabase'
 import { Button } from 'flowbite-react'
 import { Plus, Minus, Trash, Edit, X } from 'tabler-icons-react'
+import { useAuth } from '../../hooks/useAuth'
 
 interface Category {
   id: number
@@ -66,6 +67,8 @@ const OrderCreatePage: React.FC = () => {
   const [loading, setLoading] = useState(true)
 
   const selectedCategory = searchParams.get('category') || 'all'
+
+  const { user } = useAuth()
 
   // Generar ID único para cada ítem
   const generateUniqueId = (): string => {
@@ -133,7 +136,7 @@ const OrderCreatePage: React.FC = () => {
           // Transformar los items de la orden al formato que usamos
           const items: OrderItem[] = orderData.order_items.map(
             (item: OrderItem) => ({
-            //   id: generateUniqueId(), // Generar ID único para cada ítem
+              //   id: generateUniqueId(), // Generar ID único para cada ítem
               product_id: item.product_id,
               quantity: item.quantity,
               notes: item.notes || '',
@@ -230,7 +233,7 @@ const OrderCreatePage: React.FC = () => {
 
   // Calcular IGV (18%)
   const calculateIGV = () => {
-    return calculateSubtotal() * 0.18
+    return calculateSubtotal() * 0.0
   }
 
   // Calcular total
@@ -250,6 +253,9 @@ const OrderCreatePage: React.FC = () => {
     try {
       let orderData = {
         table_id: tableId ? parseInt(tableId) : null,
+        user_id: user?.id || null,
+        start_time: new Date().toISOString(),
+        end_time: null,
         status: 'pending',
       }
 
@@ -276,6 +282,8 @@ const OrderCreatePage: React.FC = () => {
           .insert([orderData])
           .select()
           .single()
+
+          console.log('Created order data:', data)
 
         if (error) throw error
         orderData = data
@@ -390,10 +398,10 @@ const OrderCreatePage: React.FC = () => {
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
-                className="border rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow"
+                className="border-2 rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow border-orange-600 dark:border-orange-500"
                 onClick={() => addProductToOrder(product)}
               >
-                <div className="h-32 bg-gray-200 rounded-md mb-2 flex items-center justify-center">
+                <div className="h-40 bg-gray-200 rounded-md mb-2 flex items-center justify-center">
                   {product.url_image ? (
                     <img
                       src={product.url_image}
@@ -404,18 +412,25 @@ const OrderCreatePage: React.FC = () => {
                     <span className="text-gray-400">Sin imagen</span>
                   )}
                 </div>
-                <h3 className="font-medium">{product.name}</h3>
-                <p className="text-sm text-gray-600 mb-1">
+                <h3 className="font-bold text-lg">{product.name}</h3>
+                <p className="text-sm text-gray-500 mb-1 dark:text-gray-400">
                   {product.description}
                 </p>
-                <p className="font-semibold">
-                  S/ {product.base_price.toFixed(2)}
+                <p className="font-extrabold text-xl text-orange-600 dark:text-orange-500">
+                  {new Intl.NumberFormat('es-PE', {
+                    style: 'currency',
+                    currency: 'PEN',
+                  }).format(product.base_price)}
                 </p>
-                {product.stock < 10 && (
-                  <p className="text-xs text-orange-600">
-                    Solo {product.stock} disponibles
-                  </p>
-                )}
+                <button
+                  className="mt-2 w-full bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-full transition-colors hover:cursor-pointer"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    addProductToOrder(product)
+                  }}
+                >
+                  Ordenar ahora
+                </button>
               </div>
             ))}
           </div>
@@ -428,29 +443,48 @@ const OrderCreatePage: React.FC = () => {
         </div>
 
         {/* Boleta de pedido */}
-        <div className="w-1/4 bg-white rounded-lg shadow p-4">
-          <h2 className="text-lg font-semibold mb-4">Boleta</h2>
-
-          <div className="mb-4 max-h-96 overflow-y-auto">
+        <div className="bg-white rounded-lg shadow p-4 w-[320px] flex flex-col min-h-[400px] min-w-[320px] md:min-w-[360px] lg:min-w-[400px]">
+          <div>
+            <h2 className="text-lg font-semibold mb-4">
+              {orderId ? 'Editar' : 'Nuevo'} Pedido
+            </h2>
+          </div>
+          <div className="mb-4 max-h-40 overflow-y-auto flex flex-col gap-4">
             {orderItems.length === 0 ? (
               <p className="text-gray-500 text-center py-4">
                 No hay productos en la orden
               </p>
             ) : (
               orderItems.map((item) => (
-                <div key={item.id} className="border-b py-2">
-                  <div className="flex justify-between items-start">
+                <div key={item.id} className="flex w-full gap-3">
+                  <div>
+                    {item.product?.url_image ? (
+                      <img
+                        src={item.product.url_image}
+                        alt={item.product.name}
+                        className="w-16 h-16 object-cover rounded mr-3"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 bg-gray-200 rounded mr-3 flex items-center justify-center text-gray-400">
+                        Sin imagen
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-start w-full">
                     <div className="flex-1">
                       <h4 className="font-medium">{item.product?.name}</h4>
                       <p className="text-sm text-gray-600">
-                        S/{' '}
-                        {(
-                          (item.product?.base_price || 0) * item.quantity
-                        ).toFixed(2)}
-                        {item.options.length > 0 &&
-                          ` + S/ ${item.options
-                            .reduce((sum, opt) => sum + opt.additional_price, 0)
-                            .toFixed(2)}`}
+                        {new Intl.NumberFormat('es-PE', {
+                          style: 'currency',
+                          currency: 'PEN',
+                        }).format(
+                          (item.product?.base_price || 0) * item.quantity +
+                            item.options.reduce(
+                              (sum, opt) =>
+                                sum + opt.additional_price * item.quantity,
+                              0
+                            )
+                        )}
                       </p>
                       {item.notes && (
                         <p className="text-xs text-gray-500">

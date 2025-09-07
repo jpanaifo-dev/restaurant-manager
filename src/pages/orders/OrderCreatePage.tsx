@@ -182,7 +182,7 @@ const OrderCreatePage: React.FC = () => {
   // Cargar opciones de productos
   useEffect(() => {
     fetchProductOptions()
-  }, [])
+  }, [tableId, orderId])
 
   // Filtrar productos por categoría
   useEffect(() => {
@@ -356,6 +356,22 @@ const OrderCreatePage: React.FC = () => {
       const { error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItemsToInsert)
+
+      // Insertar opciones de los items en tabla order_item_options, params order_item_id, product_option_id, quantity
+      const orderItemOptionsToInsert = orderItems.flatMap((item) =>
+        item.options.map((opt) => ({
+          order_item_id: item.id,
+          product_option_id: opt.id,
+          quantity: opt.quantity,
+        }))
+      )
+
+      if (orderItemOptionsToInsert.length > 0) {
+        const { error: optionsError } = await supabase
+          .from('order_item_options')
+          .insert(orderItemOptionsToInsert)
+        if (optionsError) throw optionsError
+      }
 
       if (tableId) {
         await supabase

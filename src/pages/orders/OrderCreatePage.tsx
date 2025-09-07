@@ -353,14 +353,29 @@ const OrderCreatePage: React.FC = () => {
         sub_total: (item.product?.base_price || 0) * item.quantity,
       }))
 
-      const { error: itemsError } = await supabase
+      // Esperar la creación de los order_items y obtener sus IDs reales
+      const { data: insertedOrderItems, error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItemsToInsert)
+        .select()
+
+      if (itemsError) throw itemsError
+
+      // Mapear los IDs temporales a los IDs reales
+      const tempToRealIdMap: Record<string, number> = {}
+      if (
+        insertedOrderItems &&
+        insertedOrderItems.length === orderItems.length
+      ) {
+        for (let i = 0; i < orderItems.length; i++) {
+          tempToRealIdMap[orderItems[i].id] = insertedOrderItems[i].id
+        }
+      }
 
       // Insertar opciones de los items en tabla order_item_options, params order_item_id, product_option_id, quantity
       const orderItemOptionsToInsert = orderItems.flatMap((item) =>
         item.options.map((opt) => ({
-          order_item_id: item.id,
+          order_item_id: tempToRealIdMap[item.id],
           product_option_id: opt.id,
           quantity: opt.quantity,
         }))

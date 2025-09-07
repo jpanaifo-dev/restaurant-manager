@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Badge, Card, Button } from 'flowbite-react'
 import { Clock, CurrencyDollar, Edit } from 'tabler-icons-react'
 import { useNavigate } from 'react-router-dom'
-import type { OrderItem, Product, TableWithDetails } from '../../types/supabase'
+import type { TableWithDetails } from '../../types/supabase'
 import { APP_URL } from '../../libs/config.url'
 import { TABLE_ORDER } from '../../assets'
 
@@ -63,15 +63,6 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
       return () => clearInterval(interval)
     }
   }, [table.current_order])
-
-  // Calcular total de la orden
-  const calculateOrderTotal = (
-    orderItems: (OrderItem & { product: Product })[]
-  ): number => {
-    return orderItems.reduce((total, item) => {
-      return total + item.quantity * (item.product?.base_price || 0)
-    }, 0)
-  }
 
   // Obtener icono según el estado
   const getStatusIcon = (status: string) => {
@@ -178,9 +169,7 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
                   style: 'currency',
                   currency: 'PEN',
                   minimumFractionDigits: 2,
-                }).format(
-                  calculateOrderTotal(table.current_order.order_items || [])
-                )}
+                }).format(table.current_order.total || 0)}
               </span>
               <Badge
                 color={getOrderStatusColor(table.current_order.status)}

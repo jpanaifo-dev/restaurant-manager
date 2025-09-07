@@ -46,46 +46,23 @@ const TablesView: React.FC = () => {
         .in('status', ['preparing', 'served', 'pending_payment', 'pending'])
         .order('created_at', { ascending: false })
 
-      // Obtener órdenes con sus items y productos
-      if (ordersError) throw ordersError
-
-      let ordersWithItems: typeof ordersData = []
-      if (ordersData && Array.isArray(ordersData)) {
-        ordersWithItems = await Promise.all(
-          ordersData.map(async (order) => {
-            const { data: itemsData, error: itemsError } = await supabase
-              .from('order_items')
-              .select(
-                `
-                *,
-                product:products(*)
-              `
-              )
-              .eq('order_id', order.id)
-
-            if (itemsError) throw itemsError
-
+      if (tablesData) {
+        // Mapear mesas con sus órdenes actuales
+        const tablesWithDetails: TableWithDetails[] = tablesData.map(
+          (table) => {
+            const currentOrder = ordersData?.find(
+              (order) => order.table_id === table.id
+            )
             return {
-              ...order,
-              order_items: itemsData ?? [],
+              ...table,
+              current_order: currentOrder || undefined,
             }
-          })
+          }
         )
+        setTables(tablesWithDetails)
       }
 
-      // Combinar mesas con sus órdenes activas y sus items
-      const tablesWithOrders = tablesData.map((table) => {
-        const tableOrder = ordersWithItems.find(
-          (order) => order.table_id === table.id && order.status !== 'cerrado'
-        )
-
-        return {
-          ...table,
-          current_order: tableOrder ?? undefined,
-        }
-      })
-      console.log('Mesas con órdenes:', tablesWithOrders)
-      setTables(tablesWithOrders)
+      if (ordersError) throw ordersError
     } catch (error) {
       console.error('Error cargando mesas:', error)
     } finally {

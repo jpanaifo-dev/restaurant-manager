@@ -315,6 +315,7 @@ const OrderCreatePage: React.FC = () => {
         start_time: new Date().toISOString(),
         end_time: null,
         status: 'pending',
+        total: calculateTotal(),
       }
 
       // Si estamos editando una orden existente

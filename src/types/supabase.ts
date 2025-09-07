@@ -20,6 +20,7 @@ export interface Order {
   start_time: string
   end_time?: string
   user?: User
+  total?: number
 }
 
 export interface Product {
@@ -43,6 +44,5 @@ export interface OrderItem {
 export interface TableWithDetails extends Table {
   current_order?: Order & {
     user: User
-    order_items: (OrderItem & { product: Product })[]
   }
 }

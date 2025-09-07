@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import supabase from '../../utils/supabase'
@@ -37,15 +38,18 @@ interface ProductOption {
   is_available: boolean
 }
 
+interface ProductOptionWithQuantity extends ProductOption {
+  quantity: number
+}
+
 export interface OrderItem {
   id: string // ID único temporal para cada ítem
   product_id: number
   quantity: number
   notes: string
-  options: ProductOption[]
+  options: ProductOptionWithQuantity[]
   product?: Product
 }
-
 interface Table {
   id: number
   name: string
@@ -82,84 +86,103 @@ const OrderCreatePage: React.FC = () => {
     return Date.now().toString(36) + Math.random().toString(36).substring(2)
   }
 
-  // Cargar categorías y productos
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true)
+  const fetchData = async () => {
+    setLoading(true)
 
-      // Cargar categorías
-      const { data: categoriesData, error: categoriesError } = await supabase
-        .from('categories')
-        .select('*')
-        .eq('status', 'activa')
-        .order('name')
+    // Cargar categorías
+    const { data: categoriesData, error: categoriesError } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('status', 'activa')
+      .order('name')
 
-      if (categoriesError) {
-        console.error('Error loading categories:', categoriesError)
-      } else {
-        setCategories(categoriesData || [])
-      }
-
-      // Cargar productos
-      const { data: productsData, error: productsError } = await supabase
-        .from('products')
-        .select('*, category:categories(*)')
-        .eq('status', 'activo')
-        .order('name')
-
-      if (productsError) {
-        console.error('Error loading products:', productsError)
-      } else {
-        setProducts(productsData || [])
-        setFilteredProducts(productsData || [])
-      }
-
-      // Cargar información de la mesa si tableId está presente
-      if (tableId) {
-        const { data: tableData, error: tableError } = await supabase
-          .from('tables')
-          .select('*')
-          .eq('id', tableId)
-          .single()
-
-        if (tableError) {
-          console.error('Error loading table:', tableError)
-        } else {
-          setTable(tableData)
-        }
-      }
-
-      // Cargar orden existente si orderId está presente
-      if (orderId) {
-        const { data: orderData, error: orderError } = await supabase
-          .from('orders')
-          .select('*, order_items(*, product:products(*))')
-          .eq('id', orderId)
-          .single()
-
-        if (orderError) {
-          console.error('Error loading order:', orderError)
-        } else if (orderData && orderData.order_items) {
-          // Transformar los items de la orden al formato que usamos
-          const items: OrderItem[] = orderData.order_items.map(
-            (item: OrderItem) => ({
-              //   id: generateUniqueId(), // Generar ID único para cada ítem
-              product_id: item.product_id,
-              quantity: item.quantity,
-              notes: item.notes || '',
-              options: [], // Esto se cargaría por separado si es necesario
-              product: item.product,
-            })
-          )
-          setOrderItems(items)
-        }
-      }
-
-      setLoading(false)
+    if (categoriesError) {
+      console.error('Error loading categories:', categoriesError)
+    } else {
+      setCategories(categoriesData || [])
     }
 
+    // Cargar productos
+    const { data: productsData, error: productsError } = await supabase
+      .from('products')
+      .select('*, category:categories(*)')
+      .eq('status', 'activo')
+      .order('name')
+
+    if (productsError) {
+      console.error('Error loading products:', productsError)
+    } else {
+      setProducts(productsData || [])
+      setFilteredProducts(productsData || [])
+    }
+
+    // Cargar información de la mesa si tableId está presente
+    if (tableId) {
+      const { data: tableData, error: tableError } = await supabase
+        .from('tables')
+        .select('*')
+        .eq('id', tableId)
+        .single()
+
+      if (tableError) {
+        console.error('Error loading table:', tableError)
+      } else {
+        setTable(tableData)
+      }
+    }
+
+    // Cargar orden existente si orderId está presente
+    if (orderId) {
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .select('*, order_items(*, product:products(*))')
+        .eq('id', orderId)
+        .single()
+
+      if (orderError) {
+        console.error('Error loading order:', orderError)
+      } else if (orderData && orderData.order_items) {
+        // Transformar los items de la orden al formato que usamos
+        const items: OrderItem[] = orderData.order_items.map(
+          (item: OrderItem) => ({
+            //   id: generateUniqueId(), // Generar ID único para cada ítem
+            product_id: item.product_id,
+            quantity: item.quantity,
+            notes: item.notes || '',
+            options: [], // Esto se cargaría por separado si es necesario
+            product: item.product,
+          })
+        )
+        setOrderItems(items)
+      }
+    }
+
+    setLoading(false)
+  }
+
+  const fetchProductOptions = async () => {
+    const { data: optionsData, error: optionsError } = await supabase
+      .from('product_options')
+      .select('*')
+      .eq('status', 'active')
+      .order('name')
+
+    if (optionsError) {
+      console.error('Error loading product options:', optionsError)
+    } else {
+      setProductOptions(optionsData || [])
+    }
+  }
+
+  // Cargar categorías y productos
+  useEffect(() => {
     fetchData()
   }, [tableId, orderId])
+
+  // Cargar opciones de productos
+  useEffect(() => {
+    fetchProductOptions()
+  }, [])
 
   // Filtrar productos por categoría
   useEffect(() => {
@@ -560,45 +583,103 @@ const OrderCreatePage: React.FC = () => {
                   Acompañamientos:
                 </label>
 
-                <div className="grid grid-cols-1  gap-2 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
                   {productOptions
                     .filter((opt) => opt.product_id === editingItem.product_id)
-                    .map((option) => (
-                      <div key={option.id} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`option-${option.id}`}
-                          checked={editingItem.options.some(
-                            (opt) => opt.id === option.id
-                          )}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setEditingItem({
-                                ...editingItem,
-                                options: [...editingItem.options, option],
-                              })
-                            } else {
-                              setEditingItem({
-                                ...editingItem,
-                                options: editingItem.options.filter(
-                                  (opt) => opt.id !== option.id
-                                ),
-                              })
-                            }
-                          }}
-                          className="mr-2"
-                        />
+                    .map((option) => {
+                      // Find if this option is already selected and get its quantity
+                      const selectedOption = editingItem.options.find(
+                        (opt) => opt.id === option.id
+                      )
+                      const quantity = selectedOption
+                        ? (selectedOption as ProductOptionWithQuantity)
+                            .quantity || 1
+                        : 0
 
-                        <label htmlFor={`option-${option.id}`}>
-                          {option.name} (
-                          {new Intl.NumberFormat('es-PE', {
-                            style: 'currency',
-                            currency: 'PEN',
-                          }).format(option.additional_price)}
-                          )
-                        </label>
-                      </div>
-                    ))}
+                      return (
+                        <div
+                          key={option.id}
+                          className="flex items-center justify-between"
+                        >
+                          <div>
+                            <span className="font-medium">{option.name}</span>{' '}
+                            <span className="text-gray-500">
+                              (
+                              {new Intl.NumberFormat('es-PE', {
+                                style: 'currency',
+                                currency: 'PEN',
+                              }).format(option.additional_price)}
+                              )
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button
+                              color="gray"
+                              size="xs"
+                              disabled={quantity === 0}
+                              onClick={() => {
+                                if (quantity > 1) {
+                                  setEditingItem({
+                                    ...editingItem,
+                                    options: editingItem.options.map((opt) =>
+                                      opt.id === option.id
+                                        ? {
+                                            ...opt,
+                                            quantity:
+                                              (opt as ProductOptionWithQuantity)
+                                                .quantity - 1,
+                                          }
+                                        : opt
+                                    ),
+                                  })
+                                } else if (quantity === 1) {
+                                  setEditingItem({
+                                    ...editingItem,
+                                    options: editingItem.options.filter(
+                                      (opt) => opt.id !== option.id
+                                    ),
+                                  })
+                                }
+                              }}
+                            >
+                              -
+                            </Button>
+                            <span className="w-6 text-center">{quantity}</span>
+                            <Button
+                              color="gray"
+                              size="xs"
+                              onClick={() => {
+                                if (selectedOption) {
+                                  setEditingItem({
+                                    ...editingItem,
+                                    options: editingItem.options.map((opt) =>
+                                      opt.id === option.id
+                                        ? {
+                                            ...opt,
+                                            quantity:
+                                              (opt as ProductOptionWithQuantity)
+                                                .quantity + 1,
+                                          }
+                                        : opt
+                                    ),
+                                  })
+                                } else {
+                                  setEditingItem({
+                                    ...editingItem,
+                                    options: [
+                                      ...editingItem.options,
+                                      { ...option, quantity: 1 },
+                                    ],
+                                  })
+                                }
+                              }}
+                            >
+                              +
+                            </Button>
+                          </div>
+                        </div>
+                      )
+                    })}
                 </div>
               </div>
             </div>

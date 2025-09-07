@@ -177,7 +177,7 @@ const OrderCreatePage: React.FC = () => {
   // Cargar opciones de productos
   useEffect(() => {
     fetchProductOptions()
-  }, [tableId, orderId])
+  }, [tableId, orderId, products])
 
   // Cargar categorías y productos
   useEffect(() => {
@@ -446,8 +446,8 @@ const OrderCreatePage: React.FC = () => {
           {orderId ? 'Editar' : 'Crear'} Pedido{' '}
           {table && `- Mesa: ${table.name} (${table.code})`}
         </h1>
-        <Button color="gray" onClick={() => navigate('/orders-history')}>
-          Volver al Historial
+        <Button color="gray" onClick={() => navigate(APP_URL.DASHBOARD.BASE)}>
+          Volver al panel
         </Button>
       </div>
 

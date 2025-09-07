@@ -17,7 +17,7 @@ export const SidebarCategories: React.FC<SidebarCategoriesProps> = ({
   selectedCategory,
   handleCategoryChange,
 }) => (
-  <div className="w-[240px] rounded-lg flex flex-col h-[calc(100vh-80px)]">
+  <div className="w-[240px] rounded-lg flex flex-col">
     <ul className="flex flex-col space-y-2 overflow-y-auto flex-1">
       <li className="flex">
         <button

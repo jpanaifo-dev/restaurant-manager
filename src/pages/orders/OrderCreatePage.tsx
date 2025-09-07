@@ -342,6 +342,7 @@ const OrderCreatePage: React.FC = () => {
       alert('Error al procesar la orden')
     }
 
+    await new Promise((resolve) => setTimeout(resolve, 500))
     setIsSaving(false)
   }
 
@@ -501,7 +502,12 @@ const OrderCreatePage: React.FC = () => {
 
             <div className="flex justify-between font-bold text-lg border-t pt-2">
               <span>Total:</span>
-              <span>S/ {calculateTotal().toFixed(2)}</span>
+              <span>
+                {new Intl.NumberFormat('es-PE', {
+                  style: 'currency',
+                  currency: 'PEN',
+                }).format(calculateTotal())}
+              </span>
             </div>
 
             <Button

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import supabase from '../../utils/supabase'
 import { Button } from 'flowbite-react'
 import { Plus, Minus, Trash, Edit, X } from 'tabler-icons-react'
@@ -53,11 +53,11 @@ interface Table {
 const OrderCreatePage: React.FC = () => {
   const { tableId, orderId } = useParams<{ tableId: string; orderId: string }>()
   const navigate = useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<string>('all')
   const [orderItems, setOrderItems] = useState<OrderItem[]>([])
   const [table, setTable] = useState<Table | null>(null)
   const [editingItem, setEditingItem] = useState<OrderItem | null>(null)
@@ -65,6 +65,7 @@ const OrderCreatePage: React.FC = () => {
   const [discount, setDiscount] = useState(0)
   const [loading, setLoading] = useState(true)
 
+  const selectedCategory = searchParams.get('category') || 'all'
   // Cargar categorías y productos
   useEffect(() => {
     const fetchData = async () => {
@@ -242,7 +243,7 @@ const OrderCreatePage: React.FC = () => {
 
   // Calcular IGV (18%)
   const calculateIGV = () => {
-    return calculateSubtotal() * 0.18
+    return calculateSubtotal() * 0.0
   }
 
   // Calcular total
@@ -319,6 +320,16 @@ const OrderCreatePage: React.FC = () => {
     }
   }
 
+  const handleCategoryChange = (categoryId: string) => {
+    if (categoryId === 'all') {
+      searchParams.delete('category')
+      setSearchParams(searchParams)
+    } else {
+      searchParams.set('category', categoryId)
+      setSearchParams(searchParams)
+    }
+  }
+
   if (loading) {
     return (
       <div className="p-6">
@@ -363,10 +374,10 @@ const OrderCreatePage: React.FC = () => {
               <button
                 className={`w-full h-24 flex flex-col items-center justify-center p-2 rounded-lg border ${
                   selectedCategory === 'all'
-                    ? 'bg-orange-800 text-white border-orange-900'
-                    : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
+                    ? 'bg-orange-700 text-white border-orange-800'
+                    : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50 hover:cursor-pointer'
                 }`}
-                onClick={() => setSelectedCategory('all')}
+                onClick={() => handleCategoryChange('all')}
               >
                 <div className="text-lg mb-1">📦</div>
                 <span className="text-sm font-medium">Todos los productos</span>
@@ -375,12 +386,12 @@ const OrderCreatePage: React.FC = () => {
             {categories.map((category) => (
               <li key={category.id} className="flex">
                 <button
-                  className={`w-full h-24 flex flex-col items-center justify-center p-2 rounded-lg border ${
+                  className={`w-full h-24 flex flex-col items-center justify-center p-2 rounded-lg border hover:cursor-pointer ${
                     selectedCategory === category.id.toString()
                       ? 'bg-orange-800 text-white border-orange-900'
                       : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
                   }`}
-                  onClick={() => setSelectedCategory(category.id.toString())}
+                  onClick={() => handleCategoryChange(category.id.toString())}
                 >
                   <div className="text-lg mb-1">{category.icon || '📋'}</div>
                   <span className="text-sm font-medium text-center">

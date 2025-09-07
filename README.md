@@ -1,15 +1,30 @@
-# React + TypeScript + Vite
+# Restaurant Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Vista principal](https://firebasestorage.googleapis.com/v0/b/myportafolio-aedd9.appspot.com/o/projects%2Frestaurant-service%2Frestaurant-service.webp?alt=media&token=642d3b9a-4f45-4fed-bac8-1a0103aba481)
 
-Currently, two official plugins are available:
+![Crear orden](https://firebasestorage.googleapis.com/v0/b/myportafolio-aedd9.appspot.com/o/projects%2Frestaurant-service%2Frestaurant-service-order.webp?alt=media&token=b63cb7fa-8973-4307-b68e-a72fac056a23)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+![Listado de órdenes](https://firebasestorage.googleapis.com/v0/b/myportafolio-aedd9.appspot.com/o/projects%2Frestaurant-service%2Forders.webp?alt=media&token=a11cb886-b8ef-408b-9b2a-5bfb68e79bb2)
 
-## Expanding the ESLint configuration
+## Descripción
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+**Restaurant Manager** es una aplicación web desarrollada con React, TypeScript y Vite que permite gestionar pedidos y mesas en restaurantes de forma eficiente. Incluye vistas para la administración de órdenes, la creación de pedidos y el seguimiento de estados.
+
+## Características principales
+
+- Gestión de órdenes y mesas
+- Creación y edición de pedidos
+- Visualización en tiempo real de estados
+- Interfaz intuitiva y responsiva
+
+## Tecnologías utilizadas
+
+- **React** + **TypeScript** + **Vite**
+- ESLint con reglas recomendadas y específicas para React
+
+## Configuración de ESLint
+
+Este proyecto incluye una configuración mínima de ESLint. Para aplicaciones en producción, se recomienda habilitar reglas de linting con reconocimiento de tipos:
 
 ```js
 export default tseslint.config([
@@ -17,32 +32,23 @@ export default tseslint.config([
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
       ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
+      // ...tseslint.configs.strictTypeChecked,
+      // ...tseslint.configs.stylisticTypeChecked,
     ],
     languageOptions: {
       parserOptions: {
         project: ['./tsconfig.node.json', './tsconfig.app.json'],
         tsconfigRootDir: import.meta.dirname,
       },
-      // other options...
     },
   },
 ])
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+También puedes instalar [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) y [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) para reglas específicas de React:
 
 ```js
-// eslint.config.js
 import reactX from 'eslint-plugin-react-x'
 import reactDom from 'eslint-plugin-react-dom'
 
@@ -51,10 +57,7 @@ export default tseslint.config([
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
-      // Other configs...
-      // Enable lint rules for React
       reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
       reactDom.configs.recommended,
     ],
     languageOptions: {
@@ -62,8 +65,18 @@ export default tseslint.config([
         project: ['./tsconfig.node.json', './tsconfig.app.json'],
         tsconfigRootDir: import.meta.dirname,
       },
-      // other options...
     },
   },
 ])
 ```
+
+## Instalación y ejecución
+
+```bash
+npm install
+npm run dev
+```
+
+## Licencia
+
+Este proyecto se distribuye bajo la licencia MIT.

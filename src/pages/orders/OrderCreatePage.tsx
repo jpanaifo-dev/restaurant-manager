@@ -33,7 +33,7 @@ interface ProductOption {
 }
 
 interface OrderItem {
-  id?: number
+  id: string // ID único temporal para cada ítem
   product_id: number
   quantity: number
   notes: string
@@ -66,6 +66,12 @@ const OrderCreatePage: React.FC = () => {
   const [loading, setLoading] = useState(true)
 
   const selectedCategory = searchParams.get('category') || 'all'
+
+  // Generar ID único para cada ítem
+  const generateUniqueId = (): string => {
+    return Date.now().toString(36) + Math.random().toString(36).substring(2)
+  }
+
   // Cargar categorías y productos
   useEffect(() => {
     const fetchData = async () => {
@@ -127,7 +133,7 @@ const OrderCreatePage: React.FC = () => {
           // Transformar los items de la orden al formato que usamos
           const items: OrderItem[] = orderData.order_items.map(
             (item: OrderItem) => ({
-              id: item.id,
+            //   id: generateUniqueId(), // Generar ID único para cada ítem
               product_id: item.product_id,
               quantity: item.quantity,
               notes: item.notes || '',
@@ -157,49 +163,37 @@ const OrderCreatePage: React.FC = () => {
     }
   }, [selectedCategory, products])
 
-  // Agregar producto a la orden
+  // Agregar producto a la orden (siempre como nuevo ítem)
   const addProductToOrder = (product: Product) => {
-    const existingItemIndex = orderItems.findIndex(
-      (item) => item.product_id === product.id
-    )
-
-    if (existingItemIndex >= 0) {
-      // Si el producto ya existe, aumentar la cantidad
-      const updatedItems = [...orderItems]
-      updatedItems[existingItemIndex].quantity += 1
-      setOrderItems(updatedItems)
-    } else {
-      // Si es un producto nuevo, agregarlo con cantidad 1
-      setOrderItems([
-        ...orderItems,
-        {
-          product_id: product.id,
-          quantity: 1,
-          notes: '',
-          options: [],
-          product,
-        },
-      ])
+    const newItem: OrderItem = {
+      id: generateUniqueId(), // ID único para este ítem específico
+      product_id: product.id,
+      quantity: 1,
+      notes: '',
+      options: [],
+      product: product,
     }
+
+    setOrderItems([...orderItems, newItem])
   }
 
   // Actualizar cantidad de un item
-  const updateItemQuantity = (index: number, newQuantity: number) => {
+  const updateItemQuantity = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) {
       // Si la cantidad es menor a 1, eliminar el item
-      removeItem(index)
+      removeItem(itemId)
       return
     }
 
-    const updatedItems = [...orderItems]
-    updatedItems[index].quantity = newQuantity
+    const updatedItems = orderItems.map((item) =>
+      item.id === itemId ? { ...item, quantity: newQuantity } : item
+    )
     setOrderItems(updatedItems)
   }
 
   // Eliminar item de la orden
-  const removeItem = (index: number) => {
-    const updatedItems = [...orderItems]
-    updatedItems.splice(index, 1)
+  const removeItem = (itemId: string) => {
+    const updatedItems = orderItems.filter((item) => item.id !== itemId)
     setOrderItems(updatedItems)
   }
 
@@ -213,18 +207,11 @@ const OrderCreatePage: React.FC = () => {
   const saveItemOptions = () => {
     if (!editingItem) return
 
-    const updatedItems = [...orderItems]
-    const index = updatedItems.findIndex((item) =>
-      editingItem.id
-        ? item.id === editingItem.id
-        : item.product_id === editingItem.product_id
+    const updatedItems = orderItems.map((item) =>
+      item.id === editingItem.id ? { ...editingItem } : item
     )
 
-    if (index >= 0) {
-      updatedItems[index] = { ...editingItem }
-      setOrderItems(updatedItems)
-    }
-
+    setOrderItems(updatedItems)
     setIsOptionModalOpen(false)
     setEditingItem(null)
   }
@@ -243,7 +230,7 @@ const OrderCreatePage: React.FC = () => {
 
   // Calcular IGV (18%)
   const calculateIGV = () => {
-    return calculateSubtotal() * 0.0
+    return calculateSubtotal() * 0.18
   }
 
   // Calcular total
@@ -312,11 +299,7 @@ const OrderCreatePage: React.FC = () => {
       navigate('/orders-history')
     } catch (error) {
       console.error('Error saving order:', error)
-      //   alert(
-      //     `Error al ${orderId ? 'actualizar' : 'crear'} la orden: ${
-      //       error.message
-      //     }`
-      //   )
+      alert('Error al procesar la orden')
     }
   }
 
@@ -365,10 +348,7 @@ const OrderCreatePage: React.FC = () => {
 
       <div className="flex gap-6">
         {/* Sidebar de categorías */}
-        <div
-          className="w-[200px]
-         rounded-lg px-4 flex flex-col h-[calc(100vh-80px)]"
-        >
+        <div className="w-[240px] rounded-lg flex flex-col h-[calc(100vh-80px)]">
           <ul className="flex flex-col space-y-2 overflow-y-auto flex-1">
             <li className="flex">
               <button
@@ -402,10 +382,11 @@ const OrderCreatePage: React.FC = () => {
             ))}
           </ul>
         </div>
+
         {/* Lista de productos */}
-        <div className="w-2/4 bg-white rounded-lg shadow p-4">
+        <div className="bg-white rounded-lg shadow p-4 w-full">
           <h2 className="text-lg font-semibold mb-4">Productos</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredProducts.map((product) => (
               <div
                 key={product.id}
@@ -456,8 +437,8 @@ const OrderCreatePage: React.FC = () => {
                 No hay productos en la orden
               </p>
             ) : (
-              orderItems.map((item, index) => (
-                <div key={index} className="border-b py-2">
+              orderItems.map((item) => (
+                <div key={item.id} className="border-b py-2">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h4 className="font-medium">{item.product?.name}</h4>
@@ -488,7 +469,7 @@ const OrderCreatePage: React.FC = () => {
                       <button
                         className="p-1 text-gray-500 hover:text-red-500"
                         onClick={() =>
-                          updateItemQuantity(index, item.quantity - 1)
+                          updateItemQuantity(item.id, item.quantity - 1)
                         }
                       >
                         <Minus size={16} />
@@ -499,7 +480,7 @@ const OrderCreatePage: React.FC = () => {
                       <button
                         className="p-1 text-gray-500 hover:text-green-500"
                         onClick={() =>
-                          updateItemQuantity(index, item.quantity + 1)
+                          updateItemQuantity(item.id, item.quantity + 1)
                         }
                       >
                         <Plus size={16} />
@@ -514,7 +495,7 @@ const OrderCreatePage: React.FC = () => {
 
                       <button
                         className="p-1 text-gray-500 hover:text-red-500"
-                        onClick={() => removeItem(index)}
+                        onClick={() => removeItem(item.id)}
                       >
                         <Trash size={16} />
                       </button>

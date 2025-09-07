@@ -217,12 +217,20 @@ const OrderCreatePage: React.FC = () => {
 
   // Agregar producto a la orden (siempre como nuevo ítem)
   const addProductToOrder = (product: Product) => {
+    // Filtra las opciones que corresponden a este producto y les asigna cantidad 1
+    const defaultOptions: ProductOptionWithQuantity[] = productOptions
+      .filter((opt) => opt.product_id === product.id)
+      .map((opt) => ({
+        ...opt,
+        quantity: 1,
+      }))
+
     const newItem: OrderItem = {
-      id: generateUniqueId(), // ID único para este ítem específico
+      id: generateUniqueId(),
       product_id: product.id,
       quantity: 1,
       notes: '',
-      options: [],
+      options: defaultOptions, // Opciones por defecto con cantidad 1
       product: product,
     }
 
@@ -516,6 +524,7 @@ const OrderCreatePage: React.FC = () => {
                   min="0"
                   max={calculateSubtotal() + calculateIGV()}
                   step="0.01"
+                  disabled={orderItems.length === 0}
                   value={discount}
                   onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
                   className="w-16 border rounded px-1 text-right"

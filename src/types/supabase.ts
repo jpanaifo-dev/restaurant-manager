@@ -1,3 +1,5 @@
+import type { User } from './user'
+
 // types/supabase.ts
 export interface Table {
   id: number
@@ -7,14 +9,6 @@ export interface Table {
   code: string
   shape: 'rectangle' | 'circle' | 'square'
   created_at?: string
-}
-
-export interface User {
-  id: number
-  name: string
-  role: 'mesero' | 'cajero' | 'administrador'
-  email?: string
-  phone?: string
 }
 
 export interface Order {

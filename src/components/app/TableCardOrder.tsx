@@ -35,9 +35,9 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
     if (hours > 0) {
       return `${hours}h : ${minutes}m : ${seconds}s`
     } else if (minutes > 0) {
-      return `${minutes}m : ${seconds}s`
+      return `00h: ${minutes}m : ${seconds}s`
     } else {
-      return `${seconds}s`
+      return `00h: 00m: ${seconds}s`
     }
   }
 
@@ -164,7 +164,9 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
             <div className="flex justify-between items-center flex-col">
               <div className="flex items-center text-sm">
                 <span className="font-medium truncate max-w-[100px] text-sm">
-                  {table.current_order.user?.name || 'Sin asignar'}
+                  {table.current_order.user
+                    ? `${table.current_order.user.first_name} ${table.current_order.user.last_name}`
+                    : 'Usuario desconocido'}
                 </span>
               </div>
             </div>

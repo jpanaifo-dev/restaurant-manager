@@ -40,31 +40,51 @@ const TablesView: React.FC = () => {
           `
           *,
           user:users(*),
-          order_items(
-        *,
-        product:products(*)
-          )
+          table:tables(*)
         `
         )
         .in('status', ['preparing', 'served', 'pending_payment', 'pending'])
         .order('created_at', { ascending: false })
 
-        console.log(ordersData)
-
+      // Obtener órdenes con sus items y productos
       if (ordersError) throw ordersError
 
-      // Combinar mesas con sus órdenes activas
+      let ordersWithItems: typeof ordersData = []
+      if (ordersData && Array.isArray(ordersData)) {
+        ordersWithItems = await Promise.all(
+          ordersData.map(async (order) => {
+            const { data: itemsData, error: itemsError } = await supabase
+              .from('order_items')
+              .select(
+                `
+                *,
+                product:products(*)
+              `
+              )
+              .eq('order_id', order.id)
+
+            if (itemsError) throw itemsError
+
+            return {
+              ...order,
+              order_items: itemsData ?? [],
+            }
+          })
+        )
+      }
+
+      // Combinar mesas con sus órdenes activas y sus items
       const tablesWithOrders = tablesData.map((table) => {
-        const tableOrder = ordersData.find(
+        const tableOrder = ordersWithItems.find(
           (order) => order.table_id === table.id && order.status !== 'cerrado'
         )
 
         return {
           ...table,
-          current_order: tableOrder || undefined,
+          current_order: tableOrder ?? undefined,
         }
       })
-
+      console.log('Mesas con órdenes:', tablesWithOrders)
       setTables(tablesWithOrders)
     } catch (error) {
       console.error('Error cargando mesas:', error)

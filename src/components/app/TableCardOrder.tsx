@@ -163,7 +163,7 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
             {/* Usuario y Número de Orden */}
             <div className="flex justify-between items-center flex-col">
               <div className="flex items-center text-sm">
-                <span className="font-medium truncate max-w-[100px] text-sm">
+                <span className="font-semibold truncate max-w-[100px] text-sm">
                   {table.current_order.user
                     ? `${table.current_order.user.first_name} ${table.current_order.user.last_name}`
                     : 'Usuario desconocido'}

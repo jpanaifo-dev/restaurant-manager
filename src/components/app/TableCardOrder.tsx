@@ -92,6 +92,8 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
   // Obtener color para el estado de la orden
   const getOrderStatusColor = (status: string): string => {
     switch (status) {
+      case 'pending':
+        return 'info'
       case 'preparing':
         return 'warning'
       case 'served':
@@ -106,6 +108,8 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
   // Obtener el estado de la orden y convertirlo a español
   const getOrderStatusText = (status: string): string => {
     switch (status) {
+      case 'pending':
+        return 'En proceso'
       case 'preparing':
         return 'En preparación'
       case 'served':

@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import supabase from '../../utils/supabase'
-import { Button } from 'flowbite-react'
-import { Plus, Minus, Trash, Edit, X } from 'tabler-icons-react'
+import {
+  Button,
+  CheckIcon,
+  Toast,
+  ToastToggle,
+  Modal,
+  ModalBody,
+  ModalHeader,
+} from 'flowbite-react'
 import { useAuth } from '../../hooks/useAuth'
+import { APP_URL } from '../../libs/config.url'
+import { SidebarCategories } from './SidebarCategories'
+import { OrderProduct } from './OrderProduct'
 
 interface Category {
   id: number
@@ -33,7 +43,7 @@ interface ProductOption {
   is_available: boolean
 }
 
-interface OrderItem {
+export interface OrderItem {
   id: string // ID único temporal para cada ítem
   product_id: number
   quantity: number
@@ -58,6 +68,8 @@ const OrderCreatePage: React.FC = () => {
 
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
+  const [productOptions, setProductOptions] = useState<ProductOption[]>([])
+
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([])
   const [orderItems, setOrderItems] = useState<OrderItem[]>([])
   const [table, setTable] = useState<Table | null>(null)
@@ -65,6 +77,9 @@ const OrderCreatePage: React.FC = () => {
   const [isOptionModalOpen, setIsOptionModalOpen] = useState(false)
   const [discount, setDiscount] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+
+  const [showToast, setShowToast] = useState(false)
 
   const selectedCategory = searchParams.get('category') || 'all'
 
@@ -166,6 +181,25 @@ const OrderCreatePage: React.FC = () => {
     }
   }, [selectedCategory, products])
 
+  // Cargar opciones de productos
+  useEffect(() => {
+    const fetchProductOptions = async () => {
+      const { data: optionsData, error: optionsError } = await supabase
+        .from('product_options')
+        .select('*')
+        .eq('status', 'activo')
+        .order('name')
+
+      if (optionsError) {
+        console.error('Error loading product options:', optionsError)
+      } else {
+        setProductOptions(optionsData || [])
+      }
+    }
+
+    fetchProductOptions()
+  }, [])
+
   // Agregar producto a la orden (siempre como nuevo ítem)
   const addProductToOrder = (product: Product) => {
     const newItem: OrderItem = {
@@ -250,6 +284,7 @@ const OrderCreatePage: React.FC = () => {
       return
     }
 
+    setIsSaving(true)
     try {
       let orderData = {
         table_id: tableId ? parseInt(tableId) : null,
@@ -282,9 +317,6 @@ const OrderCreatePage: React.FC = () => {
           .insert([orderData])
           .select()
           .single()
-
-          console.log('Created order data:', data)
-
         if (error) throw error
         orderData = data
       }
@@ -295,20 +327,29 @@ const OrderCreatePage: React.FC = () => {
         product_id: item.product_id,
         quantity: item.quantity,
         notes: item.notes,
+        sub_total: (item.product?.base_price || 0) * item.quantity,
       }))
 
       const { error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItemsToInsert)
 
-      if (itemsError) throw itemsError
+      if (tableId) {
+        await supabase
+          .from('tables')
+          .update({ status: 'ocupada' })
+          .eq('id', tableId)
+      }
 
-      alert(`Orden ${orderId ? 'actualizada' : 'creada'} correctamente`)
-      navigate('/orders-history')
+      if (itemsError) throw itemsError
+      setShowToast(true)
+      navigate(APP_URL.DASHBOARD.BASE)
     } catch (error) {
       console.error('Error saving order:', error)
       alert('Error al procesar la orden')
     }
+
+    setIsSaving(false)
   }
 
   const handleCategoryChange = (categoryId: string) => {
@@ -355,41 +396,11 @@ const OrderCreatePage: React.FC = () => {
       </div>
 
       <div className="flex gap-6">
-        {/* Sidebar de categorías */}
-        <div className="w-[240px] rounded-lg flex flex-col h-[calc(100vh-80px)]">
-          <ul className="flex flex-col space-y-2 overflow-y-auto flex-1">
-            <li className="flex">
-              <button
-                className={`w-full h-24 flex flex-col items-center justify-center p-2 rounded-lg border ${
-                  selectedCategory === 'all'
-                    ? 'bg-orange-700 text-white border-orange-800'
-                    : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50 hover:cursor-pointer'
-                }`}
-                onClick={() => handleCategoryChange('all')}
-              >
-                <div className="text-lg mb-1">📦</div>
-                <span className="text-sm font-medium">Todos los productos</span>
-              </button>
-            </li>
-            {categories.map((category) => (
-              <li key={category.id} className="flex">
-                <button
-                  className={`w-full h-24 flex flex-col items-center justify-center p-2 rounded-lg border hover:cursor-pointer ${
-                    selectedCategory === category.id.toString()
-                      ? 'bg-orange-800 text-white border-orange-900'
-                      : 'bg-white text-gray-800 border-gray-200 hover:bg-gray-50'
-                  }`}
-                  onClick={() => handleCategoryChange(category.id.toString())}
-                >
-                  <div className="text-lg mb-1">{category.icon || '📋'}</div>
-                  <span className="text-sm font-medium text-center">
-                    {category.name}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <SidebarCategories
+          selectedCategory={selectedCategory}
+          handleCategoryChange={handleCategoryChange}
+          categories={categories}
+        />
 
         {/* Lista de productos */}
         <div className="bg-white rounded-lg shadow p-4 w-full">
@@ -456,86 +467,13 @@ const OrderCreatePage: React.FC = () => {
               </p>
             ) : (
               orderItems.map((item) => (
-                <div key={item.id} className="flex w-full gap-3">
-                  <div>
-                    {item.product?.url_image ? (
-                      <img
-                        src={item.product.url_image}
-                        alt={item.product.name}
-                        className="w-16 h-16 object-cover rounded mr-3"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-gray-200 rounded mr-3 flex items-center justify-center text-gray-400">
-                        Sin imagen
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex justify-between items-start w-full">
-                    <div className="flex-1">
-                      <h4 className="font-medium">{item.product?.name}</h4>
-                      <p className="text-sm text-gray-600">
-                        {new Intl.NumberFormat('es-PE', {
-                          style: 'currency',
-                          currency: 'PEN',
-                        }).format(
-                          (item.product?.base_price || 0) * item.quantity +
-                            item.options.reduce(
-                              (sum, opt) =>
-                                sum + opt.additional_price * item.quantity,
-                              0
-                            )
-                        )}
-                      </p>
-                      {item.notes && (
-                        <p className="text-xs text-gray-500">
-                          Nota: {item.notes}
-                        </p>
-                      )}
-                      {item.options.length > 0 && (
-                        <div className="text-xs text-gray-500">
-                          Acomp:{' '}
-                          {item.options.map((opt) => opt.name).join(', ')}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                      <button
-                        className="p-1 text-gray-500 hover:text-red-500"
-                        onClick={() =>
-                          updateItemQuantity(item.id, item.quantity - 1)
-                        }
-                      >
-                        <Minus size={16} />
-                      </button>
-
-                      <span className="mx-1">{item.quantity}</span>
-
-                      <button
-                        className="p-1 text-gray-500 hover:text-green-500"
-                        onClick={() =>
-                          updateItemQuantity(item.id, item.quantity + 1)
-                        }
-                      >
-                        <Plus size={16} />
-                      </button>
-
-                      <button
-                        className="p-1 text-gray-500 hover:text-blue-500 ml-1"
-                        onClick={() => openEditModal(item)}
-                      >
-                        <Edit size={16} />
-                      </button>
-
-                      <button
-                        className="p-1 text-gray-500 hover:text-red-500"
-                        onClick={() => removeItem(item.id)}
-                      >
-                        <Trash size={16} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                <OrderProduct
+                  key={item.id}
+                  item={item}
+                  openEditModal={openEditModal}
+                  removeItem={removeItem}
+                  updateItemQuantity={updateItemQuantity}
+                />
               ))
             )}
           </div>
@@ -573,7 +511,11 @@ const OrderCreatePage: React.FC = () => {
               <span>S/ {calculateTotal().toFixed(2)}</span>
             </div>
 
-            <Button className="w-full mt-4" onClick={confirmOrder}>
+            <Button
+              className="w-full mt-4"
+              onClick={confirmOrder}
+              disabled={isSaving}
+            >
               {orderId ? 'Actualizar' : 'Confirmar'} Pedido
             </Button>
           </div>
@@ -582,20 +524,20 @@ const OrderCreatePage: React.FC = () => {
 
       {/* Modal para editar opciones y notas */}
       {isOptionModalOpen && editingItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-semibold">
-                Editar {editingItem.product?.name}
+        <Modal
+          show={isOptionModalOpen}
+          size="3xl"
+          popup
+          onClose={() => setIsOptionModalOpen(false)}
+        >
+          <ModalHeader>
+            <div>
+              <h3 className="text-xl font-medium text-gray-900 dark:text-white px-6 py-2">
+                Editar {editingItem?.product?.name}
               </h3>
-              <button
-                onClick={() => setIsOptionModalOpen(false)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X size={20} />
-              </button>
             </div>
-
+          </ModalHeader>
+          <ModalBody>
             <div className="p-4">
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-1">Notas:</label>
@@ -615,10 +557,47 @@ const OrderCreatePage: React.FC = () => {
                 <label className="block text-sm font-medium mb-2">
                   Acompañamientos:
                 </label>
-                <p className="text-sm text-gray-500 mb-2">
-                  Funcionalidad en desarrollo
-                </p>
-                {/* En una implementación completa, aquí se listarían las opciones disponibles para este producto */}
+
+                <div className="grid grid-cols-1  gap-2 max-h-48 overflow-y-auto">
+                  {productOptions
+                    .filter((opt) => opt.product_id === editingItem.product_id)
+                    .map((option) => (
+                      <div key={option.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`option-${option.id}`}
+                          checked={editingItem.options.some(
+                            (opt) => opt.id === option.id
+                          )}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setEditingItem({
+                                ...editingItem,
+                                options: [...editingItem.options, option],
+                              })
+                            } else {
+                              setEditingItem({
+                                ...editingItem,
+                                options: editingItem.options.filter(
+                                  (opt) => opt.id !== option.id
+                                ),
+                              })
+                            }
+                          }}
+                          className="mr-2"
+                        />
+
+                        <label htmlFor={`option-${option.id}`}>
+                          {option.name} (
+                          {new Intl.NumberFormat('es-PE', {
+                            style: 'currency',
+                            currency: 'PEN',
+                          }).format(option.additional_price)}
+                          )
+                        </label>
+                      </div>
+                    ))}
+                </div>
               </div>
             </div>
 
@@ -632,8 +611,20 @@ const OrderCreatePage: React.FC = () => {
               </Button>
               <Button onClick={saveItemOptions}>Guardar Cambios</Button>
             </div>
+          </ModalBody>
+        </Modal>
+      )}
+
+      {showToast && (
+        <Toast>
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
+            <CheckIcon className="h-5 w-5" />
           </div>
-        </div>
+          <div className="ml-3 text-sm font-normal">
+            ¡Orden procesada con éxito!
+          </div>
+          <ToastToggle />
+        </Toast>
       )}
     </div>
   )

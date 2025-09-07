@@ -46,8 +46,10 @@ const TablesView: React.FC = () => {
           )
         `
         )
-        .in('status', ['preparing', 'served', 'pending_payment'])
+        .in('status', ['preparing', 'served', 'pending_payment', 'pending'])
         .order('created_at', { ascending: false })
+
+        console.log(ordersData)
 
       if (ordersError) throw ordersError
 

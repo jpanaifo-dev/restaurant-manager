@@ -41,6 +41,7 @@ export interface OrderItem {
   product_id: number
   quantity: number
   notes?: string
+  sub_total: number
   url_image?: string
   product?: Product
 }

@@ -43,12 +43,7 @@ const OrdersHistoryPage: React.FC = () => {
     let query = supabase.from('orders').select(`
         *,
         tables (id, name, code),
-        users (id, email),
-        order_items (
-          id,
-          quantity,
-          products (name, price)
-        )
+        users (id, email)
       `)
 
     // Aplicar filtros

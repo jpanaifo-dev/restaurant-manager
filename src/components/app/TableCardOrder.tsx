@@ -123,10 +123,10 @@ const TableCardOrder: React.FC<TableCardProps> = ({ table, currentTime }) => {
     <Card
       className={`relative overflow-hidden hover:shadow-xl transform hover:cursor-pointer border-2 ${
         table.status === 'ocupada'
-          ? 'border-yellow-400 bg-yellow-50 hover:bg-yellow-100/60'
+          ? 'border-yellow-400 bg-yellow-50 hover:bg-yellow-100/60 dark:bg-yellow-900/10 dark:hover:bg-yellow-900/20'
           : table.status === 'reservada'
-          ? 'border-purple-400 bg-purple-100 hover:bg-purple-200/60'
-          : 'border-green-400 bg-green-100 hover:bg-green-200/60'
+          ? 'border-purple-400 bg-purple-100 hover:bg-purple-200/60 dark:bg-purple-900/10 dark:hover:bg-purple-900/20'
+          : 'border-green-400 bg-green-100 hover:bg-green-200/60 dark:bg-green-900/10 dark:hover:bg-green-900/20'
       }`}
       onClick={handleOrderRedirect}
     >

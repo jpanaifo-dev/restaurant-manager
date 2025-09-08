@@ -2,6 +2,7 @@
 import type React from 'react'
 import { useState } from 'react'
 import { Button, TextInput, Label, Card } from 'flowbite-react'
+import { useAuth } from '../../hooks/useAuth'
 
 interface RestaurantLoginProps {
   appName?: string
@@ -10,7 +11,6 @@ interface RestaurantLoginProps {
   backgroundImage?: string
   formTitle?: string
   formDescription?: string
-  onLogin?: (email: string, password: string) => Promise<{ error?: string }>
   onNavigate?: () => void
 }
 
@@ -21,7 +21,7 @@ const RestaurantLogin = ({
   backgroundImage = '/placeholder.svg?height=1080&width=1920',
   formTitle = 'Iniciar Sesión',
   formDescription = 'Accede a tu cuenta para gestionar tu restaurante',
-  onLogin,
+
   onNavigate,
 }: RestaurantLoginProps) => {
   const [email, setEmail] = useState('')
@@ -29,19 +29,23 @@ const RestaurantLogin = ({
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
+  const auth = useAuth()
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    if (onLogin) {
-      const result = await onLogin(email, password)
-      setLoading(false)
-      if (result?.error) {
-        setError(result.error)
+    try {
+      await auth.login(email, password)
+      if (onNavigate) {
+        onNavigate()
       } else {
-        onNavigate?.()
+        window.location.href = '/' // Redirige a la página principal
       }
+    } catch {
+      setError('Error al iniciar sesión. Por favor, verifica tus credenciales.')
+      setLoading(false)
     }
   }
 

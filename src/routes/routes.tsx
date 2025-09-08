@@ -70,7 +70,15 @@ const AppRoutes = () => {
         />
 
         {/* Ruta para la página de login */}
-        <Route path={APP_URL.AUTH.LOGIN} element={<LoginPage />} />
+        <Route
+          path={APP_URL.AUTH.LOGIN}
+          element={
+            <LoginPage
+              appName="Restaurant Manager"
+              backgroundImage="https://www.prensalibre.com/wp-content/uploads/2019/12/simpsons00.jpg?resize=1536,924"
+            />
+          }
+        />
 
         {/* Ruta para páginas no encontradas */}
         <Route

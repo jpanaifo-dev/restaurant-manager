@@ -54,7 +54,7 @@ const RestaurantLogin = ({
       />
 
       {/* Dark Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70" />
+      <div className="absolute inset-0 bg-gradient-to-br from-black to-black/60" />
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 grid lg:grid-cols-2 gap-8 items-center">
@@ -97,10 +97,10 @@ const RestaurantLogin = ({
         <div className="flex justify-center lg:justify-end">
           <Card className="w-full max-w-md bg-white/95 backdrop-blur-sm border-0 shadow-2xl">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-1 text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-1 text-center dark:text-white">
                 {formTitle}
               </h2>
-              <p className="text-gray-600 mb-6 text-center">
+              <p className="text-gray-600 mb-6 text-center dark:text-gray-300">
                 {formDescription}
               </p>
             </div>
@@ -158,7 +158,7 @@ const RestaurantLogin = ({
                 <div className="text-center pt-4">
                   <a
                     href="#"
-                    className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                    className="text-sm text-orange-600 hover:text-orange-700 font-medium dark:text-orange-400 dark:hover:text-orange-500"
                   >
                     ¿Olvidaste tu contraseña?
                   </a>
